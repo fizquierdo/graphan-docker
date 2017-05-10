@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+# Fix Sinatra version to ensure compatibility with upcoming releases
+gem 'sinatra', '1.4.7'
+#gem 'sinatra-flash', '0.3.0'
+
+group :test, :development do
+  gem 'rspec'
+  gem 'rack-test'
+end
+
+# Neography to connect to neo4j
+gem 'neography'

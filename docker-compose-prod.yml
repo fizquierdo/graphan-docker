@@ -1,0 +1,18 @@
+neo4j-prod:
+  image: neo4j:3.0
+  ports:
+   - "7474:7474" # http
+  volumes:                  
+   - ./db-prod/data:/data
+   - ./db-prod/logs:/logs
+
+sinatra:
+  build: . 
+  ports:
+    - "4567:80"
+  volumes:                  
+    - ./logs-prod/:/var/log/nginx/
+    - ./app/config/prod/config.yml:/home/app/config.yml 
+    # port: 7474, server: neo4j-prod, username: , password: 
+  links:
+    - neo4j-prod

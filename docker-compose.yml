@@ -1,0 +1,39 @@
+# DEV + TEST setup from https://github.com/neo4j/docker-neo4j/issues/34
+version: '3'
+services:
+  neo4j-dev:
+    image: neo4j:3.0
+    ports:
+      - "7474:7474" # http
+    volumes:                  
+      - ./db-dev/data:/data
+      - ./db-dev/logs:/logs
+    networks:
+      - basic-lan
+    environment:
+      - NEO4J_AUTH=none
+
+  neo4j-test:
+    image: neo4j:3.0
+    ports:
+      - "7475:7474"
+    networks:
+      - basic-lan
+    environment:
+      - NEO4J_AUTH=none
+
+  sinatra:
+    build: .
+    ports:
+      - "4567:80"
+    volumes:                  
+      - ./logs-dev/:/var/log/nginx/
+      - ./app/config/dev/config.yml:/home/app/config.yml # port: 7474, server: neo4j-dev
+    networks:
+      - basic-lan
+
+networks:
+  basic-lan:
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
