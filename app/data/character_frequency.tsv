@@ -112,7 +112,7 @@ rank	character	count	cumulative	pinyin	eng
 111	机	339823	43.7756134862	ji1	machine/opportunity/secret
 112	十	338954	43.9507798748	shi2	ten/10
 113	民	335796	44.1243142558	min2	the people/nationality/citizen
-114	第	325780	44.292672517	di4	(prefix before a number, for ordering numbers, e.g. "first", "number two", etc)
+114	第	325780	44.292672517	di4	(prefix before a number, for ordering numbers, e.g. first, number two, etc)
 115	公	318626	44.4573336973	gong1	just/honorable (designation)/public/common
 116	此	318534	44.6219473334	ci3	this/these
 117	已	318143	44.7863589065	yi3	already/to stop/then/afterwards
@@ -130,7 +130,7 @@ rank	character	count	cumulative	pinyin	eng
 129	正	296810	46.6908888683	zheng1/zheng4	Chinese 1st month of year, just (right)/main/upright/straight/correct/principle
 130	业	296169	46.8439446048	ye4	business/occupation/study
 131	外	295645	46.9967295459	wai4	outside/in addition/foreign/external
-132	将	295586	47.1494839968	jiang1/jiang4	(will, shall, "future tense")/ready/prepared/to get/to use, a general
+132	将	295586	47.1494839968	jiang1/jiang4	(will, shall, future tense)/ready/prepared/to get/to use, a general
 133	两	294600	47.3017288974	liang3	both/two/ounce/some/a few/tael
 134	高	293542	47.4534270394	gao1	high/tall
 135	间	292227	47.604445609	jian1/jian4	between/among/space/(measure word), interstice/separate
@@ -197,7 +197,7 @@ rank	character	count	cumulative	pinyin	eng
 196	提	205159	55.3604013535	di1/ti2	carry (suspended), to carry/to lift/to put forward/(upwards character stroke)/lifting (brush stroke in painting)/to mention
 197	立	204985	55.4663345544	li4	set up/to stand
 198	及	202671	55.5710719144	ji2	to reach/and
-199	比	200645	55.6747622677	bi3/bi4	(particle used for comparison and "-er than")/to compare/to contrast/to gesture (with hands)/ratio, associate with/be near
+199	比	200645	55.6747622677	bi3/bi4	(particle used for comparison and -er than)/to compare/to contrast/to gesture (with hands)/ratio, associate with/be near
 200	员	200217	55.778231437	yuan2	person/employee/member
 201	解	200090	55.8816349746	jie3/jie4/xie4	to separate/to divide/to break up/to loosen/to explain/to untie/to emancipate, transport under guard, (surname)
 202	水	198933	55.9844405918	shui3	water/river
@@ -998,7 +998,7 @@ rank	character	count	cumulative	pinyin	eng
 997	牙	31466	89.0924332124	ya2	tooth/ivory
 998	束	31370	89.1086447621	shu4	bunch/(a measure word)/to bind/to control
 999	跳	31324	89.1248325397	tiao4	jump/hop/skip (a grade)/to leap/to bounce/to beat
-1000	顶	31318	89.1410172165	ding3	go against/most/peak/top/to replace/to substitute/a measure word (use with "hat")
+1000	顶	31318	89.1410172165	ding3	go against/most/peak/top/to replace/to substitute/a measure word (use with that)
 1001	玉	31279	89.1571817387	yu4	jade
 1002	镇	31170	89.1732899314	zhen4	composed/small town/to suppress/to press down/to post
 1003	雪	30997	89.1893087202	xue3	snow
@@ -1104,7 +1104,7 @@ rank	character	count	cumulative	pinyin	eng
 1103	延	25768	90.6476050539	yan2	to prolong/to extend/to delay
 1104	震	25746	90.6609102039	zhen4	shake/shock/sign in trigram
 1105	弃	25730	90.6742070855	qi4	abandon/relinquish/to discard/to throw away
-1106	甲	25620	90.6874471206	jia3	"A" (in a sequence of examples involving "A", "B", "C", etc.)/1st heavenly stem/1st in order/armor
+1106	甲	25620	90.6874471206	jia3	A (in a sequence of examples involving A, B, C, etc.)/1st heavenly stem/1st in order/armor
 1107	伟	25591	90.700672169	wei3	big/large/great
 1108	麻	25584	90.7138935999	ma2	(to have) pins and needles/tingling/hemp/numb/to bother
 1109	川	25575	90.7271103797	chuan1	river/creek/plain/an area of level country
@@ -1870,7 +1870,7 @@ rank	character	count	cumulative	pinyin	eng
 1869	妖	8337	96.6023356683	yao1	goblin/witch/devil/bewitching/enchanting/monster/phantom
 1870	祸	8336	96.6066435892	huo4	disaster
 1871	侍	8320	96.6109432415	shi4	attend on
-1872	乙	8313	96.6152392763	yi3	"B" (in a sequence of examples involving "A", "B", "C", etc.)/2nd heavenly stem/2nd in order
+1872	乙	8313	96.6152392763	yi3	B (in a sequence of examples involving A, B, C, etc.)/2nd heavenly stem/2nd in order
 1873	妨	8311	96.6195342776	fang2	hinder/harm
 1874	贪	8304	96.6238256613	tan1	greedy
 1875	挣	8297	96.6281134276	zheng1/zheng4	struggle, to earn/to make (money)
@@ -2122,7 +2122,7 @@ rank	character	count	cumulative	pinyin	eng
 2121	蔽	6016	97.5366707889	bi4	to cover/to shield/to screen/to conceal
 2122	畅	6012	97.5397777012	chang4	smooth/fluent/joyful/happy
 2123	赠	6004	97.5428804791	zeng4	give present
-2124	妮	6000	97.5459811899	ni1	girl/phonetic "ni" (in girl's name)
+2124	妮	6000	97.5459811899	ni1	girl/phonetic ni (in girls name)
 2125	莎	5990	97.5490767329	sha1/suo1	(insect)/(phonetic), (grass)/Cyperus rotundus
 2126	尉	5988	97.5521712423	wei4	(surname)/milit. official/to quiet
 2127	冻	5984	97.5552636845	dong4	to freeze
