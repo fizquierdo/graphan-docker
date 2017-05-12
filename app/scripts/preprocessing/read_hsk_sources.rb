@@ -10,15 +10,17 @@ def validate_row(pinyin, pinyin_tonemarks, eng)
 	end
 end
 
-def print_word(fields)
-	puts fields.join("\t")
+def print_word(simp, trad, level, pinyin, pinyin_tonemarks, english)
+	pinyin_blocks = pinyin.split(/\d+/).map{|s|s.strip.downcase.gsub('v','ü')}.join(',')
+  pinyin_tones = pinyin.scan(/\d+/).join(',')
+	puts [simp, trad, level, pinyin, pinyin_tonemarks, pinyin_blocks, pinyin_tones, english].join("\t")
 end
 
 level = ARGV[0]
 filename = "data/hsk/hsk#{level}.txt"
 words =  CSV.read(filename,'r:bom|utf-8', headers: false, skip_blanks: true, col_sep:"\t")
 
-print_word %w(simp trad hsk pinyin pinyin_tonemarks eng) if level.to_i == 1
+puts %w(simp trad hsk pinyin pinyin_tonemarks pinyin_blocks pinyin_tones eng).join("\t") if level.to_i == 1
 words.each do |word|
 	simp, trad, pinyin, pinyin_tonemarks, english = word
 	if pinyin.count(',') > 0 or english.count('|') > 0
@@ -28,9 +30,9 @@ words.each do |word|
 		pin_marks_list = pinyin_tonemarks.split(',')
 		eng_list			 = english.split('|')
 		pin_list.zip(pin_marks_list, eng_list) do |pin, pin_marks, eng|
-			print_word([simp, trad, level, pin.strip, pin_marks.strip, eng.strip])
+			print_word(simp, trad, level, pin.strip, pin_marks.strip, eng.strip)
 		end
 	else
-		print_word([simp, trad, level, pinyin, pinyin_tonemarks, english])
+		print_word(simp, trad, level, pinyin, pinyin_tonemarks, english)
 	end
 end

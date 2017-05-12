@@ -83,7 +83,7 @@ describe "DB seeds" do
 		end
 
 		it 'word node has all expected properties' do
-			word_properties = %w(hsk unique eng trad simp pinyin pinyin_tonemarks)
+			word_properties = %w(hsk unique eng trad simp pinyin pinyin_tonemarks pinyin_blocks pinyin_tones)
 			cypher = "MATCH (n:Word{simp:'鱼'})
 								RETURN keys(n) as properties"
 			ret = @neo.run_cypher(cypher)
