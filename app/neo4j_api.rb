@@ -76,40 +76,44 @@ class Neo4j
 	end
 
 	def import_words(words_url)
-		cypher = "LOAD CSV WITH HEADERS FROM '#{words_url}' as line
-						FIELDTERMINATOR '\t' 
-						CREATE (:Word {simp: line.simp, 
-													unique:line.simp + '('+line.pinyin+')', 
-													trad:line.trad, 
-													hsk: line.hsk, 
-													pinyin: line.pinyin, 
-													pinyin_tonemarks: line.pinyin_tonemarks, 
-													pinyin_blocks: split(line.pinyin_blocks,','), 
-													pinyin_tones: split(line.pinyin_tones,','), 
-													eng: line.eng})"
-													@neo.execute_query(cypher)
+		cypher = "
+		LOAD CSV WITH HEADERS FROM '#{words_url}' as line
+		FIELDTERMINATOR '\t' 
+		CREATE (:Word {simp: line.simp, 
+		unique:line.simp + '('+line.pinyin+')', 
+		trad:line.trad, 
+		hsk: line.hsk, 
+		pinyin: line.pinyin, 
+		pinyin_tonemarks: line.pinyin_tonemarks, 
+		pinyin_blocks: split(line.pinyin_blocks,','), 
+		pinyin_tones: split(line.pinyin_tones,','), 
+		eng: line.eng})"
+		@neo.execute_query(cypher)
 	end
 	def link_words_with_pinyin_blocks
-		cypher = "MATCH (w:Word)
-						WITH w.pinyin_blocks as blocks, w
-						UNWIND blocks as block
-						MATCH (available_block:PinyinBlock{block: block})
-						CREATE UNIQUE (w)-[:HAS_PINYIN_BLOCK]->(available_block)"
-						@neo.execute_query(cypher)
+		cypher = "
+		MATCH (w:Word)
+		WITH w.pinyin_blocks as blocks, w
+		UNWIND blocks as block
+		MATCH (available_block:PinyinBlock{block: block})
+		CREATE UNIQUE (w)-[:HAS_PINYIN_BLOCK]->(available_block)"
+		@neo.execute_query(cypher)
 	end
 	def create_pinyin_from_words
-		cypher = " MATCH (w:Word) 
-						WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm
-						MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})"
-						@neo.execute_query(cypher)
+		cypher = "
+		MATCH (w:Word) 
+		WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm
+		MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})"
+		@neo.execute_query(cypher)
 	end
 	def link_words_with_pinyin
-		cypher = " MATCH (w:Word) 
-						WITH w.pinyin as pinyins, w as word
-						UNWIND pinyins as pinyin
-						MATCH (available_pinyin:PinyinWord{pinyin: pinyin})
-						CREATE UNIQUE (word)-[:HAS_PINYIN]->(available_pinyin)"
-						@neo.execute_query(cypher)
+		cypher = "
+		MATCH (w:Word) 
+		WITH w.pinyin as pinyins, w as word
+		UNWIND pinyins as pinyin
+		MATCH (available_pinyin:PinyinWord{pinyin: pinyin})
+		CREATE UNIQUE (word)-[:HAS_PINYIN]->(available_pinyin)"
+		@neo.execute_query(cypher)
 	end
 
 	#### generic 
@@ -126,14 +130,16 @@ class Neo4j
 
 	#### finders and executers (could be generic?)
 	def find_pinyin_block(block)
-		cypher = "MATCH (b:PinyinBlock{block: '#{block}'}) 
-              RETURN b.block as block, b.vow as vow, b.cons as cons"
+		cypher = "
+		MATCH (b:PinyinBlock{block: '#{block}'}) 
+		RETURN b.block as block, b.vow as vow, b.cons as cons"
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)[0]
 	end
 	def find_radical(simp)
-		cypher = "MATCH (r:Radical{simp: '#{simp}'}) 
-		          RETURN r.simp as simp"
+		cypher = "
+		MATCH (r:Radical{simp: '#{simp}'}) 
+		RETURN r.simp as simp"
     graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)[0]
 	end
