@@ -114,6 +114,25 @@ describe "DB seeds" do
 			expect(ret.map{|b| b[:block]}).to match_array(%w(zheng zai))
 		end
 
+		it 'pinyin words can be extracted from words' do
+			@neo.create_pinyin_from_words
+			cypher = "MATCH (pw:PinyinWord)
+								RETURN count(pw) as cnt"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.first[:cnt]).to eq(11)
+		end
+
+		it 'words can be linked to pinyin word nodes' do
+			@neo.create_pinyin_from_words
+			@neo.link_words_with_pinyin
+			cypher = "MATCH (w:Word{simp:'正在'})-[:HAS_PINYIN]->(pw:PinyinWord)
+								RETURN pw.pinyin as pinyin"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:pinyin]).to eq("zheng4zai4")
+		end
+
+
 	end
 
 end
