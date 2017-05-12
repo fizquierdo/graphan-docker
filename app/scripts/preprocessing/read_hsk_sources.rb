@@ -18,7 +18,7 @@ level = ARGV[0]
 filename = "data/hsk/hsk#{level}.txt"
 words =  CSV.read(filename,'r:bom|utf-8', headers: false, skip_blanks: true, col_sep:"\t")
 
-print_word %w(simp trad hsk pinyin pinyin_tonemarks eng) if level == 1
+print_word %w(simp trad hsk pinyin pinyin_tonemarks eng) if level.to_i == 1
 words.each do |word|
 	simp, trad, pinyin, pinyin_tonemarks, english = word
 	if pinyin.count(',') > 0 or english.count('|') > 0
