@@ -75,6 +75,19 @@ class Neo4j
 		end
 	end
 
+	def import_words(words_url)
+		cypher = "LOAD CSV WITH HEADERS FROM '#{words_url}' as line
+						FIELDTERMINATOR '\t' 
+						CREATE (:Word {simp: line.simp, 
+													unique:line.simp + '('+line.pinyin+')', 
+													trad:line.trad, 
+													hsk: line.hsk, 
+													pinyin: line.pinyin, 
+													pinyin_tonemarks: line.pinyin_tonemarks, 
+													eng: line.eng})"
+		@neo.execute_query(cypher)
+	end
+
 	#### generic 
 
 	def count_nodes
@@ -104,7 +117,7 @@ class Neo4j
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)
 	end
-	
+
 
 	private
 	def records_to_hashes(graph)

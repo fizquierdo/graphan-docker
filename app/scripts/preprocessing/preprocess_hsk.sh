@@ -4,7 +4,7 @@
 HSKFILE=data/hsk_words.tsv
 rm -f $HSKFILE
 
-for LEVEL in 1 2 #3 4 5 6
+for LEVEL in 1 2 3 4 5 6
 do
 	ruby scripts/preprocessing/read_hsk_sources.rb ${LEVEL} >> $HSKFILE
 done

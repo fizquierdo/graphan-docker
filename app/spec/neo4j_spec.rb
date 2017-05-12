@@ -60,6 +60,37 @@ describe "DB seeds" do
 			expect(ret.size).to eq(1)
 			expect(ret.first[:variant_simp]).to eq('八')
 		end
+	end
+
+	describe "Import of word lists" do 
+		before(:each) do
+			url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/hsk_words.tsv"
+			@neo.import_words(url)
+		end
+
+		it 'imports all expected words' do
+			expect(@neo.count_nodes).to equal(11)
+		end
+
+		it 'creating multiple nodes for characters with multiple meanings' do
+			cypher = "MATCH (n:Word{simp:'累'})
+								RETURN n.simp as simp, n.pinyin as pinyin, n.eng as eng"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(3)
+			ret_lei_tired = ret.select{|r| r[:pinyin] == "lei4"}.first
+			expect(ret_lei_tired[:pinyin]).to eq("lei4")
+			expect(ret_lei_tired[:eng]).to eq("tired")
+		end
+
+		it 'word node has all expected properties' do
+			word_properties = %w(hsk unique eng trad simp pinyin pinyin_tonemarks)
+			cypher = "MATCH (n:Word{simp:'鱼'})
+								RETURN keys(n) as properties"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:properties]).to match_array(word_properties)
+		end
 
 	end
+
 end
