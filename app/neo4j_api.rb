@@ -87,7 +87,7 @@ class Neo4j
 													pinyin_blocks: split(line.pinyin_blocks,','), 
 													pinyin_tones: split(line.pinyin_tones,','), 
 													eng: line.eng})"
-		@neo.execute_query(cypher)
+													@neo.execute_query(cypher)
 	end
 	def link_words_with_pinyin_blocks
 		cypher = "MATCH (w:Word)
@@ -95,27 +95,22 @@ class Neo4j
 						UNWIND blocks as block
 						MATCH (available_block:PinyinBlock{block: block})
 						CREATE UNIQUE (w)-[:HAS_PINYIN_BLOCK]->(available_block)"
-		@neo.execute_query(cypher)
+						@neo.execute_query(cypher)
 	end
 	def create_pinyin_from_words
-		cypher = "
-		MATCH (w:Word) 
-		WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm
-		MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})
-		"
+		cypher = " MATCH (w:Word) 
+						WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm
+						MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})"
 		@neo.execute_query(cypher)
 	end
 	def link_words_with_pinyin
-		cypher = "
-		MATCH (w:Word) 
-		WITH w.pinyin as pinyins, w as word
-		UNWIND pinyins as pinyin
-		MATCH (available_pinyin:PinyinWord{pinyin: pinyin})
-		CREATE UNIQUE (word)-[:HAS_PINYIN]->(available_pinyin)
-		"
+		cypher = " MATCH (w:Word) 
+						WITH w.pinyin as pinyins, w as word
+						UNWIND pinyins as pinyin
+						MATCH (available_pinyin:PinyinWord{pinyin: pinyin})
+						CREATE UNIQUE (word)-[:HAS_PINYIN]->(available_pinyin)"
 		@neo.execute_query(cypher)
 	end
-
 
 	#### generic 
 
