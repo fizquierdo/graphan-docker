@@ -27,11 +27,15 @@ describe "DB seeds" do
 		init_test_db
 	end
 
-	describe "Import of pinyin blocks" do 
-		it 'imports blocks with cons prefix and vowel suffix' do
+	def import_pinyin_blocks
 			path = File.join(File.dirname(__FILE__), 'data/pinyinchart.csv')
 			@neo.add_pinyin_blocks(path)
-			expect(@neo.count_nodes).to equal(53)
+	end
+
+	describe "Import of pinyin blocks" do 
+		it 'imports blocks with cons prefix and vowel suffix' do
+			import_pinyin_blocks
+			expect(@neo.count_nodes).to equal(90)
 			b = @neo.find_pinyin_block("eng")
 			expect(b).to eq({block: "eng", cons: "NA", vow: "eng"})
 			b = @neo.find_pinyin_block("huang")
@@ -100,6 +104,20 @@ describe "DB seeds" do
 			expect(ret.first[:properties]).to match_array(word_properties)
 		end
 
+		it 'words are linked to pinyin blocks' do
+			import_pinyin_blocks
+			@neo.link_words_with_pinyin_blocks
+			cypher = "MATCH (w:Word{simp:'正在'})-[:HAS_PINYIN_BLOCK]->(block:PinyinBlock)
+								RETURN block.block as block"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(2)
+			expect(ret.map{|b| b[:block]}).to match_array(%w(zheng zai))
+		end
+
 	end
 
 end
+
+
+
+

@@ -5,8 +5,8 @@ neo = Neo4j.new({"port" => 7474, "server" => "localhost"})
 
 puts "Deleting previous DB"
 neo.clean
-#puts "Creating Pinyin Blocks"
-#neo.add_pinyin_blocks("data/pinyinchart.csv")
+puts "Creating Pinyin Blocks"
+neo.add_pinyin_blocks("data/pinyinchart.csv")
 #puts "Adding radical list"
 #neo.add_radicals("data/radical_list.csv")
 puts "Importing words"

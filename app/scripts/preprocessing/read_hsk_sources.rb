@@ -11,7 +11,12 @@ def validate_row(pinyin, pinyin_tonemarks, eng)
 end
 
 def print_word(simp, trad, level, pinyin, pinyin_tonemarks, english)
+	####
+	# Formats a word with multiple representations of pinyin
+
+	# Convert the v into what we use for the pinyin blocks
 	pinyin_blocks = pinyin.split(/\d+/).map{|s|s.strip.downcase.gsub('v','ü')}.join(',')
+	# extract the numerical representation of the word
   pinyin_tones = pinyin.scan(/\d+/).join(',')
 	puts [simp, trad, level, pinyin, pinyin_tonemarks, pinyin_blocks, pinyin_tones, english].join("\t")
 end

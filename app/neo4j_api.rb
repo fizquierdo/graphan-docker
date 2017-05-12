@@ -89,6 +89,15 @@ class Neo4j
 													eng: line.eng})"
 		@neo.execute_query(cypher)
 	end
+	def link_words_with_pinyin_blocks
+		cypher = "MATCH (w:Word)
+						WITH w.pinyin_blocks as blocks, w
+						UNWIND blocks as block
+						MATCH (available_block:PinyinBlock{block: block})
+						CREATE UNIQUE (w)-[:HAS_PINYIN_BLOCK]->(available_block)"
+		@neo.execute_query(cypher)
+	end
+
 
 	#### generic 
 
@@ -131,3 +140,11 @@ class Neo4j
 	end
 
 end
+
+
+=begin
+MATCH (w:Word{simp: '我们'})
+WITH w.pinyin_blocks as blocks, w
+UNWIND blocks as block
+RETURN block, w.unique
+=end
