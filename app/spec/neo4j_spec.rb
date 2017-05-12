@@ -132,6 +132,22 @@ describe "DB seeds" do
 			expect(ret.first[:pinyin]).to eq("zheng4zai4")
 		end
 
+		it 'pinyin tone combos can be extracted from words' do
+			@neo.create_tone_combos_from_words
+			cypher = "MATCH (tn:ToneCombo) RETURN count(tn) as cnt"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.first[:cnt]).to eq(4)
+		end
+		it 'words can be linked to pinyin word nodes' do
+			@neo.create_tone_combos_from_words
+			@neo.link_words_with_combos
+			cypher = "
+			MATCH (w:Word{simp:'正在'})-[:HAS_TONE]->(tn:ToneCombo)
+			RETURN tn.tone as tone_combo"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:tone_combo]).to eq("44")
+		end
 
 	end
 
