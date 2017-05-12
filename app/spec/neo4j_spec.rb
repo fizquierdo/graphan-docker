@@ -33,7 +33,7 @@ describe "DB seeds" do
 			@neo.add_pinyin_blocks(path)
 			expect(@neo.count_nodes).to equal(53)
 			b = @neo.find_pinyin_block("eng")
-			expect(b).to eq({block: "eng", cons: "No-Cons", vow: "eng"})
+			expect(b).to eq({block: "eng", cons: "NA", vow: "eng"})
 			b = @neo.find_pinyin_block("huang")
 			expect(b).to eq({block: "huang", cons: "h", vow: "uang"})
 		end

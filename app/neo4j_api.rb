@@ -29,7 +29,7 @@ class Neo4j
 
 		vowels = pinyin.headers - ["cons"]
 		pinyin.each do |p|
-			cons = p["cons"] || 'No-Cons'
+			cons = p["cons"] 
 			vowels.each do |vow|
 				unless p[vow].nil?
 					chart_block = p[vow]
