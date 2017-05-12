@@ -12,3 +12,7 @@
 	docker-compose -f docker-compose-prod.yml up -d 
 	docker-compose -f docker-compose-prod.yml stop
 
+### Pre-processing made to HSK lists
+
+	cd app && sh scripts/preprocessing/preprocess_hsk.sh
+
