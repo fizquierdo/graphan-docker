@@ -84,6 +84,8 @@ class Neo4j
 													hsk: line.hsk, 
 													pinyin: line.pinyin, 
 													pinyin_tonemarks: line.pinyin_tonemarks, 
+													pinyin_blocks: split(line.pinyin_blocks,','), 
+													pinyin_tones: split(line.pinyin_tones,','), 
 													eng: line.eng})"
 		@neo.execute_query(cypher)
 	end

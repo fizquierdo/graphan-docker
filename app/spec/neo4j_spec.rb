@@ -82,6 +82,15 @@ describe "DB seeds" do
 			expect(ret_lei_tired[:eng]).to eq("tired")
 		end
 
+		it 'splitting tones correctly' do
+			cypher = "MATCH (w:Word{simp:'正在'})
+								RETURN w.pinyin as pinyin, w.pinyin_tones as tones, w.pinyin_blocks as blocks"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:blocks]).to match_array(%w(zheng zai))
+			expect(ret.first[:tones]).to match_array(%w(4 4))
+		end
+
 		it 'word node has all expected properties' do
 			word_properties = %w(hsk unique eng trad simp pinyin pinyin_tonemarks pinyin_blocks pinyin_tones)
 			cypher = "MATCH (n:Word{simp:'鱼'})
