@@ -10,13 +10,13 @@ class Neo4j
 		if config["username"].nil?
 			# DEV and TEST env do not use authentication
 			@neo = Neography::Rest.new({port: config["port"], 
-																 server: config["server"]})
+                                  server: config["server"]})
 		else
 			# username/password defaults to "neo4j", updated after creating DB
-			@neo = Neography::Rest.new({port: config["port"], 
-																 server: config["server"],
-																 username: config["username"],
-																 password: config["password"]})
+			@neo = Neography::Rest.new({port: config["port"],
+                                  server: config["server"],
+                                  username: config["username"],
+                                  password: config["password"]})
 		end
 	end
 
@@ -127,15 +127,15 @@ class Neo4j
 	#### finders and executers (could be generic?)
 	def find_pinyin_block(block)
 		cypher = "MATCH (b:PinyinBlock{block: '#{block}'}) 
-							RETURN b.block as block, b.vow as vow, b.cons as cons"
-							graph = @neo.execute_query(cypher)
-							records_to_hashes(graph)[0]
+              RETURN b.block as block, b.vow as vow, b.cons as cons"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)[0]
 	end
 	def find_radical(simp)
 		cypher = "MATCH (r:Radical{simp: '#{simp}'}) 
-							RETURN r.simp as simp"
-							graph = @neo.execute_query(cypher)
-							records_to_hashes(graph)[0]
+		          RETURN r.simp as simp"
+    graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)[0]
 	end
 	def run_cypher(cypher) 
 		graph = @neo.execute_query(cypher)
@@ -153,11 +153,3 @@ class Neo4j
 	end
 
 end
-
-
-=begin
-MATCH (w:Word{simp: '我们'})
-WITH w.pinyin_blocks as blocks, w
-UNWIND blocks as block
-RETURN block, w.unique
-=end
