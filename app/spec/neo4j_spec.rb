@@ -161,8 +161,16 @@ describe "DB seeds" do
 			expect(ret.map{|b| b[:simp]}).to match_array(%w(正 在))
 		end
 		it 'freq ranks can be added to characters' do
+			char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/character_frequency.tsv"
+			@neo.create_characters_from_words
 			@neo.add_freq_rank_to_characters(char_ranks_url)
+			cypher = "
+			MATCH (ch:Character) 
+			RETURN ch.simp as simp, ch.freq_rank as rank"
 			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(9)
+			expect(ret.select{|ch| ch[:simp] == "这"}.first[:rank]).to eq(11)
+			expect(ret.select{|ch| ch[:simp] == "在"}.first[:rank]).to be_nil
 		end
 
 	end

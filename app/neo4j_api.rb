@@ -137,7 +137,7 @@ class Neo4j
 		cypher = "
 		LOAD CSV WITH HEADERS FROM '#{char_ranks_url}' as line
 		FIELDTERMINATOR '\t' 
-		WITH line.character as char, line.rank as rank
+		WITH line.character as char, toInt(line.rank) as rank
 		MATCH (ch:Character{simp: char})
 		SET ch.freq_rank = rank"
 		@neo.execute_query(cypher)
