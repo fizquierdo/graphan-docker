@@ -26,5 +26,9 @@ neo.create_tone_combos_from_words
 # Characters
 puts "Create character nodes from words"
 neo.create_characters_from_words
+
 puts "Add frequency to characters"
-puts "Connect characters to radical"
+char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/character_frequency.tsv"
+neo.add_freq_rank_to_characters(char_ranks_url)
+puts "Generate list of decomposed characters"
+puts "Add character decomposition to character"

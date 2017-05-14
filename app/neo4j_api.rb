@@ -131,6 +131,17 @@ class Neo4j
 		CREATE UNIQUE (word)-[:HAS_CHARACTER]->(ch)"
 		@neo.execute_query(cypher)
 	end
+	def add_freq_rank_to_characters(char_ranks_url)
+		# Create a property freq_rank if the character is present in the tsv
+		# The property will not exist (NULL) for characters not present in the list
+		cypher = "
+		LOAD CSV WITH HEADERS FROM '#{char_ranks_url}' as line
+		FIELDTERMINATOR '\t' 
+		WITH line.character as char, line.rank as rank
+		MATCH (ch:Character{simp: char})
+		SET ch.freq_rank = rank"
+		@neo.execute_query(cypher)
+	end
 
 	#### generic 
 
