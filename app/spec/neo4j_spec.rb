@@ -121,10 +121,8 @@ describe "DB seeds" do
 			ret = @neo.run_cypher(cypher)
 			expect(ret.first[:cnt]).to eq(11)
 		end
-
 		it 'words can be linked to pinyin word nodes' do
 			@neo.create_pinyin_from_words
-			@neo.link_words_with_pinyin
 			cypher = "MATCH (w:Word{simp:'正在'})-[:HAS_PINYIN]->(pw:PinyinWord)
 								RETURN pw.pinyin as pinyin"
 			ret = @neo.run_cypher(cypher)
@@ -140,7 +138,6 @@ describe "DB seeds" do
 		end
 		it 'words can be linked to pinyin word nodes' do
 			@neo.create_tone_combos_from_words
-			@neo.link_words_with_combos
 			cypher = "
 			MATCH (w:Word{simp:'正在'})-[:HAS_TONE]->(tn:ToneCombo)
 			RETURN tn.tone as tone_combo"
@@ -149,10 +146,21 @@ describe "DB seeds" do
 			expect(ret.first[:tone_combo]).to eq("44")
 		end
 
+		it 'Characters can be extracted from words' do
+			@neo.create_characters_from_words
+			cypher = "MATCH (ch:Character) RETURN count(ch) as cnt"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.first[:cnt]).to eq(9)
+		end
+		it 'words are linked characters' do
+			@neo.create_characters_from_words
+			cypher = "MATCH (w:Word{simp:'正在'})-[:HAS_CHARACTER]->(ch:Character)
+								RETURN ch.simp as simp"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(2)
+			expect(ret.map{|b| b[:simp]}).to match_array(%w(正 在))
+		end
+
 	end
 
 end
-
-
-
-

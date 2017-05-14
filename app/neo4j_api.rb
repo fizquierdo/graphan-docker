@@ -99,38 +99,36 @@ class Neo4j
 		CREATE UNIQUE (w)-[:HAS_PINYIN_BLOCK]->(available_block)"
 		@neo.execute_query(cypher)
 	end
-	# Pinyin 
+
+	# Pinyin words
 	def create_pinyin_from_words
 		cypher = "
 		MATCH (w:Word) 
-		WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm
-		MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})"
+		WITH DISTINCT w.pinyin as pw, w.pinyin_tonemarks as tm, w as word
+		MERGE (py:PinyinWord{pinyin: pw, pinyin_tm: tm})
+		CREATE UNIQUE (word)-[:HAS_PINYIN]->(py)"
 		@neo.execute_query(cypher)
 	end
-	def link_words_with_pinyin
-		cypher = "
-		MATCH (w:Word) 
-		WITH w.pinyin as pinyins, w as word
-		UNWIND pinyins as pinyin
-		MATCH (available_pinyin:PinyinWord{pinyin: pinyin})
-		CREATE UNIQUE (word)-[:HAS_PINYIN]->(available_pinyin)"
-		@neo.execute_query(cypher)
-	end
+
 	# Pinyin Combos
 	def create_tone_combos_from_words
 		# Create tone combos, e.g. zheng4zai4 has tones [4,4] and combo 44
 		cypher = "
 		MATCH (w:Word) 
-		WITH DISTINCT w.pinyin_tones as tones
-		MERGE (tn:ToneCombo {tone: reduce(acc = '', x IN tones | acc + x)})"
+		WITH DISTINCT w.pinyin_tones as tones, w as word
+		MERGE (tn:ToneCombo {tone: reduce(acc = '', x IN tones | acc + x)})
+		CREATE UNIQUE (word)-[:HAS_TONE]->(tn)"
 		@neo.execute_query(cypher)
 	end
-	def link_words_with_combos
+
+	# Characters
+	def create_characters_from_words
 		cypher = "
 		MATCH (w:Word) 
-		WITH w.pinyin_tones as tones, w as word
-		MATCH (tn:ToneCombo{tone: reduce(acc = '', x IN tones | acc + x)})
-		CREATE UNIQUE (word)-[:HAS_TONE]->(tn)"
+		WITH split(w.simp,'') as simplified_characters, w as word
+		UNWIND simplified_characters as simplified_char
+		MERGE (ch:Character {simp: simplified_char})
+		CREATE UNIQUE (word)-[:HAS_CHARACTER]->(ch)"
 		@neo.execute_query(cypher)
 	end
 
