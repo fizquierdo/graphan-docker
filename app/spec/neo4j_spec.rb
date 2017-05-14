@@ -173,6 +173,21 @@ describe "DB seeds" do
 			expect(ret.select{|ch| ch[:simp] == "在"}.first[:rank]).to be_nil
 		end
 
+		it 'characters can be linked to radicals' do
+			path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
+			@neo.add_radicals(path)
+			char_radicals_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/hsk_radicals.csv"
+			@neo.create_characters_from_words
+			@neo.link_characters_to_radicals(char_radicals_url)
+			cypher = "
+			MATCH (ch:Character)-[:HAS_RADICAL]->(rd:Radical)
+			RETURN ch.simp as char, rd.simp as rad"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(2)
+			expect(ret.select{|ch| ch[:char] == "在"}.first[:rad]).to eq("亻")
+			expect(ret.select{|ch| ch[:char] == "正"}.first[:rad]).to eq("一")
+		end
+
 	end
 
 end

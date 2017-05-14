@@ -144,16 +144,17 @@ class Neo4j
 	end
 
 	def link_characters_to_radicals(char_radicals_url)
-		# Create a property freq_rank if the character is present in the tsv
-		# The property will not exist (NULL) for characters not present in the list
 		cypher = "
 		LOAD CSV WITH HEADERS FROM '#{char_radicals_url}' as line
-		FIELDTERMINATOR '\t' 
-		WITH split(line.radicals, ';') as radicals, line.character as simp 
+		WITH split(line.radicals, ';') as radicals, line.character as char_simp 
 		UNWIND radicals as radical
-		RETURN simp, radical"
+		WITH trim(radical) as radical_simp, char_simp
+		MATCH (rd:Radical{simp: radical_simp})
+		MATCH (ch:Character{simp: char_simp})
+		CREATE UNIQUE (ch)-[:HAS_RADICAL]->(rd)"
 		@neo.execute_query(cypher)
 	end
+
 
 	#### generic 
 

@@ -7,8 +7,8 @@ puts "Deleting previous DB"
 neo.clean
 puts "Creating Pinyin Blocks"
 neo.add_pinyin_blocks("data/pinyinchart.csv")
-#puts "Adding radical list"
-#neo.add_radicals("data/radical_list.csv")
+puts "Adding radical list"
+neo.add_radicals("data/radical_list.csv")
 
 # Words
 puts "Importing words"
@@ -30,5 +30,7 @@ neo.create_characters_from_words
 puts "Add frequency to characters"
 char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/character_frequency.tsv"
 neo.add_freq_rank_to_characters(char_ranks_url)
+
 puts "Add character decomposition to character"
-# This can be done via LOAD CSV as well
+char_radicals_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/hsk_radicals.csv"
+neo.link_characters_to_radicals(char_radicals_url)
