@@ -160,6 +160,10 @@ describe "DB seeds" do
 			expect(ret.size).to eq(2)
 			expect(ret.map{|b| b[:simp]}).to match_array(%w(正 在))
 		end
+		it 'freq ranks can be added to characters' do
+			@neo.add_freq_rank_to_characters(char_ranks_url)
+			ret = @neo.run_cypher(cypher)
+		end
 
 	end
 
