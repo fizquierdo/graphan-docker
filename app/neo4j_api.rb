@@ -143,6 +143,18 @@ class Neo4j
 		@neo.execute_query(cypher)
 	end
 
+	def link_characters_to_radicals(char_radicals_url)
+		# Create a property freq_rank if the character is present in the tsv
+		# The property will not exist (NULL) for characters not present in the list
+		cypher = "
+		LOAD CSV WITH HEADERS FROM '#{char_radicals_url}' as line
+		FIELDTERMINATOR '\t' 
+		WITH split(line.radicals, ';') as radicals, line.character as simp 
+		UNWIND radicals as radical
+		RETURN simp, radical"
+		@neo.execute_query(cypher)
+	end
+
 	#### generic 
 
 	def count_nodes

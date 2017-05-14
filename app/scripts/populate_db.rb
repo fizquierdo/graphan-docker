@@ -30,5 +30,5 @@ neo.create_characters_from_words
 puts "Add frequency to characters"
 char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/character_frequency.tsv"
 neo.add_freq_rank_to_characters(char_ranks_url)
-puts "Generate list of decomposed characters"
 puts "Add character decomposition to character"
+# This can be done via LOAD CSV as well
