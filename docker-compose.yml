@@ -1,5 +1,5 @@
 # DEV + TEST setup from https://github.com/neo4j/docker-neo4j/issues/34
-version: '3'
+version: '2'
 services:
   neo4j-dev:
     image: neo4j:3.0
