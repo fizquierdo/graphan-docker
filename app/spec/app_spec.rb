@@ -2,6 +2,8 @@ require 'spec_helper'
 require 'rack/test'
 require_relative '../app'
 
+ENV['RACK_ENV'] = nil  
+
 describe "neo4j app" do
 
 	include Rack::Test::Methods
