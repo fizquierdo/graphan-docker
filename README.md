@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/fizquierdo/graphan-docker.svg?branch=master)](https://travis-ci.org/fizquierdo/graphan-docker)
+
 ### Create and start TEST and DEV neo4j db containers:
 
 	docker-compose build
