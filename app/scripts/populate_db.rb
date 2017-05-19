@@ -27,9 +27,11 @@ neo.create_tone_combos_from_words
 # Characters
 puts "Create character nodes from words"
 neo.create_characters_from_words
-
 puts "Add frequency to characters"
 neo.add_freq_rank_to_characters(data_url+"character_frequency.tsv")
-
 puts "Add character decomposition to character"
 neo.link_characters_to_radicals(data_url+"hsk_radicals.csv")
+
+# Backbone
+puts "Add backbone nodes"
+neo.add_backbone(data_url+"backbone.csv")

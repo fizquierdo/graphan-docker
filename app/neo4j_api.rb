@@ -156,6 +156,38 @@ class Neo4j
 	end
 
 
+	# backbone
+	def add_backbone(backbone_url)
+		cypher = "
+		LOAD CSV WITH HEADERS FROM '#{backbone_url}' as line
+		WITH trim(toString(line.char_id)) as b_id, trim(line.char) as simp, split(line.formula,'+') as parts
+		MERGE (b:Backbone{backbone_id: b_id}) SET b.simp = simp
+		//connect the part-of nodes
+		WITH parts, b_id, b, simp
+		UNWIND parts as part
+		MATCH (part_node:Backbone{backbone_id: trim(part)})
+		CREATE UNIQUE (part_node)-[:PART_OF]->(b)
+		// connect to existing nodes
+		WITH b, simp
+		MATCH (radical:Radical{simp: simp})
+		MATCH (word:Word{simp: simp})
+		MATCH (character:Character{simp: simp})
+		CREATE UNIQUE (b)-[:IS_RADICAL]->(radical)
+		CREATE UNIQUE (b)-[:IS_WORD]->(word)
+		CREATE UNIQUE (b)-[:IS_CHARACTER]->(character)"
+		@neo.execute_query(cypher)
+
+		# Create a linked list of ordered nodes
+		cypher = "
+		MATCH (b:Backbone)
+		WHERE toInt(b.backbone_id) IS NOT NULL
+		WITH toInt(b.backbone_id) as b_id, toInt(b.backbone_id) + 1 as next_id
+		MATCH (from:Backbone{backbone_id: toString(b_id)})
+		MATCH (to:Backbone{backbone_id: toString(next_id)})
+		CREATE UNIQUE (from)-[:NEXT]->(to)"
+		@neo.execute_query(cypher)
+	end
+
 	#### generic 
 
 	def count_nodes
