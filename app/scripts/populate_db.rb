@@ -1,6 +1,8 @@
 require_relative '../neo4j_api'
 
 # Import data into DEV
+data_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/"
+
 neo = Neo4j.new({"port" => 7474, "server" => "localhost"})
 
 puts "Deleting previous DB"
@@ -12,8 +14,7 @@ neo.add_radicals("data/radical_list.csv")
 
 # Words
 puts "Importing words"
-words_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/hsk_words.tsv"
-neo.import_words(words_url)
+neo.import_words(data_url+"hsk_words.tsv")
 
 # Pinyin
 puts "Linking pinyin blocks"
@@ -28,9 +29,7 @@ puts "Create character nodes from words"
 neo.create_characters_from_words
 
 puts "Add frequency to characters"
-char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/character_frequency.tsv"
-neo.add_freq_rank_to_characters(char_ranks_url)
+neo.add_freq_rank_to_characters(data_url+"character_frequency.tsv")
 
 puts "Add character decomposition to character"
-char_radicals_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/hsk_radicals.csv"
-neo.link_characters_to_radicals(char_radicals_url)
+neo.link_characters_to_radicals(data_url+"hsk_radicals.csv")
