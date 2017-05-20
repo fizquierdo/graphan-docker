@@ -79,7 +79,7 @@ describe "DB seeds" do
 		end
 
 		it 'imports all expected words' do
-			expect(@neo.count_nodes).to equal(11)
+			expect(@neo.count_nodes).to equal(12)
 		end
 
 		it 'creating multiple nodes for characters with multiple meanings' do
@@ -125,7 +125,7 @@ describe "DB seeds" do
 			cypher = "MATCH (pw:PinyinWord)
 								RETURN count(pw) as cnt"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.first[:cnt]).to eq(11)
+			expect(ret.first[:cnt]).to eq(12)
 		end
 		it 'words can be linked to pinyin word nodes' do
 			@neo.create_pinyin_from_words
@@ -140,7 +140,7 @@ describe "DB seeds" do
 			@neo.create_tone_combos_from_words
 			cypher = "MATCH (tn:ToneCombo) RETURN count(tn) as cnt"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.first[:cnt]).to eq(4)
+			expect(ret.first[:cnt]).to eq(5)
 		end
 		it 'words can be linked to pinyin word nodes' do
 			@neo.create_tone_combos_from_words
@@ -156,7 +156,7 @@ describe "DB seeds" do
 			@neo.create_characters_from_words
 			cypher = "MATCH (ch:Character) RETURN count(ch) as cnt"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.first[:cnt]).to eq(9)
+			expect(ret.first[:cnt]).to eq(10)
 		end
 		it 'words are linked characters' do
 			@neo.create_characters_from_words
@@ -174,7 +174,7 @@ describe "DB seeds" do
 			MATCH (ch:Character) 
 			RETURN ch.simp as simp, ch.freq_rank as rank"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.size).to eq(9)
+			expect(ret.size).to eq(10)
 			expect(ret.select{|ch| ch[:simp] == "这"}.first[:rank]).to eq(11)
 			expect(ret.select{|ch| ch[:simp] == "在"}.first[:rank]).to be_nil
 		end
@@ -188,7 +188,8 @@ describe "DB seeds" do
 			MATCH (ch:Character)-[:HAS_RADICAL]->(rd:Radical)
 			RETURN ch.simp as char, rd.simp as rad"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.size).to eq(2)
+			expect(ret.size).to eq(3)
+			expect(ret.select{|ch| ch[:char] == "一"}.first[:rad]).to eq("一")
 			expect(ret.select{|ch| ch[:char] == "在"}.first[:rad]).to eq("亻")
 			expect(ret.select{|ch| ch[:char] == "正"}.first[:rad]).to eq("一")
 		end
@@ -233,13 +234,15 @@ describe "DB seeds" do
 			cypher = "MATCH (b:Backbone)-[:IS_WORD]->(w:Word) 
 								RETURN b.backbone_id as b_id, w.simp as simp"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.size).to eq(0)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:simp]).to eq("一")
 		end
 		it 'backbone connected to characters' do
 			cypher = "MATCH (b:Backbone)-[:IS_CHARACTER]->(ch:Character) 
 								RETURN b.backbone_id as b_id, ch.simp as simp"
 			ret = @neo.run_cypher(cypher)
-			expect(ret.size).to eq(0)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:simp]).to eq("一")
 		end
 	end
 
