@@ -166,15 +166,28 @@ class Neo4j
 		WITH parts, b_id, b, simp
 		UNWIND parts as part
 		MATCH (part_node:Backbone{backbone_id: trim(part)})
-		CREATE UNIQUE (part_node)-[:PART_OF]->(b)
-		// connect to existing nodes
-		WITH b, simp
-		MATCH (radical:Radical{simp: simp})
-		MATCH (word:Word{simp: simp})
-		MATCH (character:Character{simp: simp})
-		CREATE UNIQUE (b)-[:IS_RADICAL]->(radical)
-		CREATE UNIQUE (b)-[:IS_WORD]->(word)
-		CREATE UNIQUE (b)-[:IS_CHARACTER]->(character)"
+		CREATE UNIQUE (part_node)-[:PART_OF]->(b)"
+		@neo.execute_query(cypher)
+
+		# Link radicals
+		cypher = "
+		MATCH (b:Backbone)
+		MATCH (rad:Radical{simp: b.simp})
+		CREATE UNIQUE (b)-[:IS_RADICAL]->(rad)"
+		@neo.execute_query(cypher)
+
+		# Link words
+		cypher = "
+		MATCH (b:Backbone)
+		MATCH (w:Word{simp: b.simp})
+		CREATE UNIQUE (b)-[:IS_WORD]->(w)"
+		@neo.execute_query(cypher)
+
+		# Link characters
+		cypher = "
+		MATCH (b:Backbone)
+		MATCH (ch:Character{simp: b.simp})
+		CREATE UNIQUE (b)-[:IS_CHARACTER]->(ch)"
 		@neo.execute_query(cypher)
 
 		# Create a linked list of ordered nodes

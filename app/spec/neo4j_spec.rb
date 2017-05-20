@@ -31,6 +31,14 @@ describe "DB seeds" do
 			path = File.join(File.dirname(__FILE__), 'data/pinyinchart.csv')
 			@neo.add_pinyin_blocks(path)
 	end
+	def import_radicals
+			path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
+			@neo.add_radicals(path)
+	end
+	def import_words
+			url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/hsk_words.tsv"
+			@neo.import_words(url)
+	end
 
 	describe "Import of pinyin blocks" do 
 		it 'imports blocks with cons prefix and vowel suffix' do
@@ -45,8 +53,7 @@ describe "DB seeds" do
 
 	describe "Import of radical lists" do 
 		before(:each) do
-			path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
-			@neo.add_radicals(path)
+			import_radicals
 		end
 
 		it 'imports all expected radicals' do
@@ -68,8 +75,7 @@ describe "DB seeds" do
 
 	describe "Import of word lists" do 
 		before(:each) do
-			url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/hsk_words.tsv"
-			@neo.import_words(url)
+			import_words
 		end
 
 		it 'imports all expected words' do
@@ -174,8 +180,7 @@ describe "DB seeds" do
 		end
 
 		it 'characters can be linked to radicals' do
-			path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
-			@neo.add_radicals(path)
+			import_radicals
 			char_radicals_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/data/hsk_radicals.csv"
 			@neo.create_characters_from_words
 			@neo.link_characters_to_radicals(char_radicals_url)
@@ -188,6 +193,54 @@ describe "DB seeds" do
 			expect(ret.select{|ch| ch[:char] == "正"}.first[:rad]).to eq("一")
 		end
 
+	end
+
+	describe "Import of backbone" do 
+		before(:each) do
+			import_radicals
+			import_words
+			@neo.create_characters_from_words
+			backbone_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/backbone.csv"
+			@neo.add_backbone(backbone_url)
+		end
+
+		it 'imports backbone nodes' do
+			cypher = "MATCH (b:Backbone) RETURN count(b) as cnt"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.first[:cnt]).to eq(15)
+		end
+		it 'backbone has backbone parts' do
+			cypher = "MATCH (b:Backbone{backbone_id: '10'})<-[:PART_OF]-(part:Backbone) 
+								RETURN part.backbone_id as b_id"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(2)
+			expect(ret.map{|b|b[:b_id]}).to match_array(%w(7 10a))
+		end
+		it 'backbone nodes are a linked list' do
+			cypher = "MATCH (b:Backbone)-[:NEXT]->(next:Backbone) 
+								RETURN next.backbone_id as b_id"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(12)
+		end
+		it 'backbone connected to radicals' do
+			cypher = "MATCH (b:Backbone)-[:IS_RADICAL]->(rad:Radical) 
+								RETURN b.backbone_id as b_id, rad.simp as simp"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(4)
+			expect(ret.select{|b|b[:b_id] == "1"}.first[:simp]).to eq("一")
+		end
+		it 'backbone connected to words' do
+			cypher = "MATCH (b:Backbone)-[:IS_WORD]->(w:Word) 
+								RETURN b.backbone_id as b_id, w.simp as simp"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(0)
+		end
+		it 'backbone connected to characters' do
+			cypher = "MATCH (b:Backbone)-[:IS_CHARACTER]->(ch:Character) 
+								RETURN b.backbone_id as b_id, ch.simp as simp"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to eq(0)
+		end
 	end
 
 end
