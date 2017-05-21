@@ -1,3 +1,14 @@
 <p>Neo4j DB running in localhost:7474</p>
-
 <p>Node count: <%= @num_nodes %></p>
+
+<% if session[:user] %>
+	<p>Hello <%= @username %></p>
+<% else %>
+	<div class="jumbotron">
+		<p>
+		<a href="/signin" >Sign in</a> if you have an account
+		or <a href="/signup" >Sign up</a> to create one and start learning.
+		</p>
+	</div>
+<% end %>
+

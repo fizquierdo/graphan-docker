@@ -2,10 +2,14 @@ source 'https://rubygems.org'
 
 # Fix Sinatra version to ensure compatibility with upcoming releases
 gem 'sinatra', '1.4.7'
-#gem 'sinatra-flash', '0.3.0'
 
+# Testing
 gem 'rspec'
 gem 'rack-test'
 
 # Neography to connect to neo4j
-gem 'neography'
+gem 'neography', '1.8.0'
+
+# Application
+gem 'sinatra-flash', '0.3.0'
+gem 'bcrypt', '3.1.11'

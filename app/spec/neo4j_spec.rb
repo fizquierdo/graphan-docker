@@ -9,7 +9,7 @@ def init_test_db
 	@neo.clean
 end
 
-describe "neo4j-API integration" do
+describe "Neo4j-API integration" do
 
 	before(:each) do
 		init_test_db
@@ -21,7 +21,52 @@ describe "neo4j-API integration" do
 
 end
 
-describe "DB seeds" do 
+describe "Neo4j User management" do
+
+	before(:each) do
+		init_test_db
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+	end
+
+	describe "User creation" do
+
+		it 'User can be created' do
+			@neo.create_user(@user_data)
+			expect(@neo.count_nodes).to equal(1)
+		end
+
+		it 'User details can be retrieved' do
+			@neo.create_user(@user_data)
+			users = @neo.get_users('Bob')
+			expect(users.size).to equal(1)
+			user = users.first
+			expect(user[:name]).to eq('Bob')
+			expect(user[:hash]).to eq('hashedvalue')
+		end
+
+		it 'Two different users can be created' do
+			@neo.create_user(@user_data)
+			@neo.create_user({name: 'Alice', hash: 'hashedvalue'})
+			expect(@neo.count_nodes).to equal(2)
+		end
+
+		it 'User starts ignoring all words in DB' do
+			words = %w(一 在)
+			words.each {|w| @neo.run_cypher("CREATE (w:Word{simp:'#{w}'})")}
+			@neo.create_user(@user_data)
+
+			cypher = "MATCH (user:Person{name: 'Bob'})-[:IGNORES]->(w:Word)
+								RETURN w.simp as simp"
+			ret = @neo.run_cypher(cypher)
+			expect(ret.size).to equal(words.size)
+			expect(ret.map{|b| b[:simp]}).to match_array(words)
+		end
+
+	end
+
+end
+
+describe "Neo4j DB seeds" do 
 
 	before(:each) do
 		init_test_db

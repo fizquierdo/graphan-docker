@@ -21,6 +21,33 @@ class Neo4j
 	end
 
 
+	#### 
+	# Users 
+	#
+	def get_users(username)
+		cypher = "
+		MATCH (p:Person{name:'#{username}'}) 
+		RETURN p.name as name, p.hash as hash"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+
+	def create_user(user)
+		# Add a user node to the db where 
+		# user <- {name: params[:username], hash: hash}
+		node = @neo.create_node(user)
+		@neo.add_label(node, "Person")
+		initialize_user(user[:name])
+	end
+
+	def initialize_user(name)
+		# the person should start ignoring all words
+		cypher = "
+		MATCH (p:Person {name:'#{name}'}), (w:Word)
+		CREATE (p)-[:IGNORES{date: TIMESTAMP()}]->(w)"
+		@neo.execute_query(cypher)
+	end
+
 	#### import 
 	def add_pinyin_blocks(filename)
 		# Add all possible pinyin sounds from a table file in csv format

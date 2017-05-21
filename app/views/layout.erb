@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='UTF-8' />
+		<title>Graphan</title>
+		<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel='stylesheet' />
+	</head>
+	<body class='container-fluid'>
+
+		<!--header -->
+		<div>
+			<ul class="nav nav-pills">
+				<!--Navigation generic -->
+				<li><a href="/"					>Home</a></li>
+
+				<!--Navigation signin-out-up -->
+				<% if session[:user] %>
+					<form class="form-inline pull-right" action="signout" method="GET">
+						Logged in as <%= session[:user] %>
+						<input type="submit" class="btn btn-link" value="sign out">
+					</form>
+				<% else %>
+					<li class="pull-right"><a href="/signin" >Sign in</a></li>
+					<li class="pull-right"><a href="/signup" >Sign up</a></li>
+				<% end %>
+
+			</ul>
+		</div>
+		<!--End of header -->
+
+		<!--notification -->
+		<% if flash[:notice] %>
+			<div class="alert alert-info">
+					<p><%= flash[:notice] %></p>
+			</div>
+		 <% end %>
+		<!--End of notification -->
+
+		<%= yield %>
+
+	</body>
+</html>
