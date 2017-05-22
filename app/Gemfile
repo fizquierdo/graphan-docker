@@ -13,3 +13,4 @@ gem 'neography', '1.8.0'
 # Application
 gem 'sinatra-flash', '0.3.0'
 gem 'bcrypt', '3.1.11'
+gem 'terminal-table', '1.7.3'

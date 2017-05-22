@@ -1,0 +1,26 @@
+<div class="thumbnail">
+	<% words.each do |word| %>
+		<div class="row">
+			<div class="col-md-6 col-sm-6 col-xs-6 text-center recommendation">
+				<form action="follow_recommendation" method="GET">
+					<input type="hidden" name="word_unique" value="<%= word[:word_unique] %>">
+					<input type="hidden" name="backbone_id" value="<%= word[:backbone_id] %>">
+					<input type="submit" class="btn btn-default btn-md btn-block" value="<%= word[:simp] %>">
+				</form>
+			</div>
+			<div class="col-md-3 col-sm-3 col-xs-3 pinyin-content hidden">
+				<%= word[:pinyin] %>
+			</div>
+			<div class="col-md-3 col-sm-3 col-xs-3 text-muted">
+				<%= word[:level] %>
+			</div>
+		</div>
+	<% end %>
+
+	<!-- toggle pinyin -->
+	<p>
+	<center>
+	<a href="#" onclick="$('.pinyin-content').toggleClass('hidden');">Show/hide pinyin</a>
+	</center>
+	</p>
+</div>

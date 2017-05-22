@@ -48,7 +48,9 @@ class Neo4j
 		@neo.execute_query(cypher)
 	end
 
-	#### import 
+	#### 
+	# Import 
+	#
 	def add_pinyin_blocks(filename)
 		# Add all possible pinyin sounds from a table file in csv format
 		pinyin = CSV.read(filename, headers: true)
@@ -228,8 +230,9 @@ class Neo4j
 		@neo.execute_query(cypher)
 	end
 
-	#### generic 
-
+	#### 
+	# Generic 
+	#
 	def count_nodes
 		result = @neo.execute_query("MATCH (n) RETURN count(n) as count")
 		result["data"][0][0]
@@ -240,7 +243,14 @@ class Neo4j
 		@neo.execute_query("MATCH (n) DETACH DELETE n")
 	end
 
-	#### finders and executers (could be generic?)
+	def run_cypher(cypher) 
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+
+	#### 
+	# Queries for tests
+	#
 	def find_pinyin_block(block)
 		cypher = "
 		MATCH (b:PinyinBlock{block: '#{block}'}) 
@@ -248,6 +258,7 @@ class Neo4j
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)[0]
 	end
+
 	def find_radical(simp)
 		cypher = "
 		MATCH (r:Radical{simp: '#{simp}'}) 
@@ -255,11 +266,72 @@ class Neo4j
     graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)[0]
 	end
-	def run_cypher(cypher) 
+
+	#### 
+	# Queries for views
+	#
+	# Index
+	#  all pending testing
+	def words_top(username, relationship, top_size)
+		# Some words will not be connected to the backbone yet, 
+		# but they will later on as the backbone grows
+		cypher = "MATCH (u:Person {name:'#{username}'})-[rel:#{relationship}]->(w:Word) 
+							MATCH (ch:Character)<-[:HAS_CHARACTER]-(w)-[:HAS_PINYIN]->(pw:PinyinWord)
+						  MATCH (b:Backbone)-[:IS_CHARACTER]->(ch)
+							RETURN type(rel) as word_rel, 
+										 w.hsk as level,
+										 w.unique as word_unique,
+										 w.simp as simp,
+										 pw.pinyin_tm as pinyin,
+										 collect(b.backbone_id)[0] as backbone_id
+							ORDER BY level, length(word_unique), toInt(backbone_id)
+							LIMIT #{top_size}"
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)
 	end
 
+	def words_last_timestamp(username, relationship)
+		cypher = "MATCH (u:Person {name:'#{username}'})-[rel:#{relationship}]->(w:Word) 
+		          RETURN w.simp, rel.date
+							ORDER BY rel.date DESC
+							LIMIT 1"
+		graph = @neo.execute_query(cypher)
+	  simp, timestamp = graph["data"].first # because we know we limit 1
+		#date = Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d %H:%M:%S")
+		date = Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d")
+		[simp, date]
+	end
+
+	def word_user_counts(user)
+		# Independently of the backbone, how many other words are related to a given character?
+		cypher = "MATCH (p:Person{name: '#{user}'})-[rel]->(w:Word)
+							RETURN type(rel) as rel, 
+										 w.hsk as level,
+										 count(w.unique) as count"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+	def word_bb_counts
+		# Independently of the user, how many other words are related to the backbone?
+		cypher = "MATCH (w:Word)-[:HAS_CHARACTER]->(:Character)<-[:IS_CHARACTER]-(b:Backbone)
+						  RETURN count(DISTINCT w.unique) as count,
+										 w.hsk as level
+							ORDER BY level"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+	def characters_connected(in_backbone=true)
+		# words of length == 1
+		# How many characters are represented in the backbone
+		cond = in_backbone ? '' : 'NOT'
+		cypher = "MATCH (w:Word) 
+						  WHERE #{cond} (w)<-[:IS_WORD]-(:Backbone) AND length(w.simp) = 1
+							RETURN count(w.simp) as count, 
+										 w.hsk as level
+							ORDER BY level"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
 
 	private
 	def records_to_hashes(graph)

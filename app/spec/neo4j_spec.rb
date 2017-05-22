@@ -1,12 +1,28 @@
 require 'spec_helper'
 require_relative '../neo4j_api'
 
-
 def init_test_db
 	# Use the neo4j-test docker container, run rspec from localhost
 	test_config = {"port" => 7475, "server" => "localhost"}
 	@neo = Neo4j.new(test_config)
 	@neo.clean
+end
+
+def import_pinyin_blocks
+		path = File.join(File.dirname(__FILE__), 'data/pinyinchart.csv')
+		@neo.add_pinyin_blocks(path)
+end
+def import_radicals
+		path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
+		@neo.add_radicals(path)
+end
+def import_words
+		url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/hsk_words.tsv"
+		@neo.import_words(url)
+end
+def import_backbone
+		backbone_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/backbone.csv"
+		@neo.add_backbone(backbone_url)
 end
 
 describe "Neo4j-API integration" do
@@ -20,6 +36,64 @@ describe "Neo4j-API integration" do
 	end
 
 end
+
+describe "Queries for index view" do
+
+	before(:each) do
+		init_test_db
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+	end
+
+	describe "words_top" do
+
+		before(:each) do
+			import_words
+			import_radicals
+			@neo.create_characters_from_words
+			@neo.create_pinyin_from_words
+			import_backbone
+			@neo.create_user(@user_data)
+		end
+
+		it 'returns 1 words as ignore for just created user for top 1' do
+			ret = @neo.words_top('Bob', 'IGNORES', 1)
+			expect(ret.size).to eq(1)
+			w = ret.first
+			expect(w[:simp]).to eq("一")
+			expect(w[:backbone_id]).to eq("1")
+			expect(w[:level]).to eq("1")
+			expect(w[:word_rel]).to eq("IGNORES")
+		end
+
+		it 'returns 1 words as ignore for just created user for top 5' do
+			ret = @neo.words_top('Bob', 'IGNORES', 5)
+			expect(ret.size).to eq(1)
+		end
+
+		it 'returns 0 words as LEARNING for just created user for top 5' do
+			%w(LEARNING KNOWS).each do |state|
+				ret = @neo.words_top('Bob', state, 1)
+				expect(ret.size).to eq(0)
+				expect(ret.empty?).to be true
+			end
+		end
+		# TODO test the ORDER BY aspect of the query
+	end
+
+	describe "words_last_timestamp" do
+		before(:each) do
+			@neo.run_cypher("CREATE (w:Word{simp:'课'})")
+			@neo.create_user(@user_data)
+		end
+		it 'returns 1 simplified character and a recent date' do
+			simp, date = @neo.words_last_timestamp('Bob', 'IGNORES')
+			expect(simp).to eq('课')
+			expect(date).to eq(Time.now.strftime("%Y-%m-%d"))
+		end
+	end
+
+end
+
 
 describe "Neo4j User management" do
 
@@ -70,19 +144,6 @@ describe "Neo4j DB seeds" do
 
 	before(:each) do
 		init_test_db
-	end
-
-	def import_pinyin_blocks
-			path = File.join(File.dirname(__FILE__), 'data/pinyinchart.csv')
-			@neo.add_pinyin_blocks(path)
-	end
-	def import_radicals
-			path = File.join(File.dirname(__FILE__), 'data/radical_list.csv')
-			@neo.add_radicals(path)
-	end
-	def import_words
-			url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/hsk_words.tsv"
-			@neo.import_words(url)
 	end
 
 	describe "Import of pinyin blocks" do 
@@ -246,8 +307,7 @@ describe "Neo4j DB seeds" do
 			import_radicals
 			import_words
 			@neo.create_characters_from_words
-			backbone_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/backbone.csv"
-			@neo.add_backbone(backbone_url)
+			import_backbone
 		end
 
 		it 'imports backbone nodes' do

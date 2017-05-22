@@ -104,6 +104,35 @@ end
 
 get '/' do
 	@username = get_username
-	@num_nodes = graphan.count_nodes
+
+	## TODO think what would be a good summary 
+	states = {}
+	%w(KNOWS LEARNING IGNORES).each do |state|
+		states[state] = graphan.words_last_timestamp(@username, state)
+	end
+	@learning_simp = states['LEARNING'][0]
+	@learning_date = states['LEARNING'][1]
+	@known_simp = states['KNOWS'][0]
+	@known_date = states['KNOWS'][1]
+
+	panel = Panel.new graphan.word_user_counts(@username)
+	@count_headings, @count_rows = panel.counts_table
+
+	# Recommendations
+	top_size = 5
+	@learning_top = graphan.words_top(@username, 'LEARNING', top_size)
+	@ignores_top  = graphan.words_top(@username, 'IGNORES', top_size)
+
+	# Backbone state (this info is independent of the user, just shows bb-quality)
+	if @username == 'admin'
+		disconn= graphan.characters_connected(false)
+		connect= graphan.characters_connected(true)
+		word_bb_counts = graphan.word_bb_counts
+		@bb_headings, @bb_rows = panel.backbone_table(disconn, connect, word_bb_counts)
+		@display_bb = true
+	else
+		@display_bb = false
+	end
+
 	erb :index
 end
