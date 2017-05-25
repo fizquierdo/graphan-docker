@@ -92,6 +92,34 @@ describe "Queries for index view" do
 		end
 	end
 
+	describe "word_user_counts" do
+		before(:each) do
+			@neo.run_cypher("CREATE (w:Word{simp:'课', hsk: 1, unique: 'uid'})")
+			@neo.create_user(@user_data)
+		end
+		it 'returns 1 word and it is ignored' do
+			ret = @neo.word_user_counts('Bob')
+			expect(ret.size).to eq(1)
+			expect(ret.first[:level]).to eq(1)
+			expect(ret.first[:rel]).to eq('IGNORES')
+		end
+		it 'returns multiple words and one is LEARNING' do
+			%w(一 二 三).each do |w|
+				@neo.run_cypher("CREATE (w:Word{simp:'#{w}', hsk: 2, unique: 'uid'})")
+				cypher = "MATCH (bob:Person{name: 'Bob'}), (w:Word{simp: '#{w}'})
+									CREATE (bob)-[:LEARNING]->(w)"
+				@neo.run_cypher(cypher)
+			end
+			ret = @neo.word_user_counts('Bob')
+			p ret
+			expect(ret.size).to eq(2)
+			learning = ret.select{|c| c[:rel] == "LEARNING"}
+			expect(learning.size).to eq(1)
+			expect(learning.first[:count]).to eq(3)
+			expect(learning.first[:level]).to eq(2)
+		end
+	end
+
 end
 
 
