@@ -14,3 +14,6 @@ gem 'neography', '1.8.0'
 gem 'sinatra-flash', '0.3.0'
 gem 'bcrypt', '3.1.11'
 gem 'terminal-table', '1.7.3'
+
+# CI 
+gem "codeclimate-test-reporter", "~> 1.0.0"

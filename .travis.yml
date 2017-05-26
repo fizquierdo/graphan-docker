@@ -16,8 +16,13 @@ script:
   - rspec -f d spec
 
 after_success:
+  - codeclimate-test-reporter
   - docker-compose stop
 
 after_failure:
   - docker-compose stop
   - docker-compose logs
+
+addons:
+  code_climate:
+    repo_token: CODECLIMATE_REPO_TOKEN
