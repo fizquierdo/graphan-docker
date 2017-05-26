@@ -99,6 +99,7 @@ describe "Queries for index view" do
 		end
 		it 'returns 1 word and it is ignored' do
 			ret = @neo.word_user_counts('Bob')
+			p ret
 			expect(ret.size).to eq(1)
 			expect(ret.first[:level]).to eq(1)
 			expect(ret.first[:rel]).to eq('IGNORES')
@@ -111,7 +112,6 @@ describe "Queries for index view" do
 				@neo.run_cypher(cypher)
 			end
 			ret = @neo.word_user_counts('Bob')
-			p ret
 			expect(ret.size).to eq(2)
 			learning = ret.select{|c| c[:rel] == "LEARNING"}
 			expect(learning.size).to eq(1)

@@ -5,8 +5,8 @@ class Panel
 
 	def initialize(query_counts)
 		# query_counts <- [{rel: IGNORES|LEARNING|KNOWS, level: HSK_INT, count: INT},{}]
-		@levels = 1.upto(6).map{|l| 'hsk' + l.to_s}
-		@states = %(IGNORES LEARNING KNOWS).split(' ')
+		@levels = 1.upto(6).to_a
+		@states = %w(IGNORES LEARNING KNOWS)
 
 	  # @values[level][state] = count
 		# initialization to 0 counts
