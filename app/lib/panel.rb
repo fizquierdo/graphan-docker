@@ -49,12 +49,20 @@ class Panel
 	def backbone_table(disconn, connect, words_connected)
 		# Format results of character_connected queries into table rows
 		headings = ['chars-in-bb', 'chars-not-repr', 'words-via-bb', 'level']
-		l = @levels
-		[disconn, connect, words_connected].each do |counter|
-			raise "Unexpected size #{counter.size}" if counter.size != l.size 
-		end
-		rows = l.each_with_index.map do |level, i|
-			  [connect[i][:count], disconn[i][:count], words_connected[i][:count], level]
+		rows = @levels.map do |level|
+				row = []
+				[disconn, connect, words_connected].each do |a|
+					counter = a.select{|c| c[:level] == level}
+					if counter.empty?
+						count = 0
+					else
+						raise "Unexpected size #{counter.size}" unless counter.size == 1
+						count = counter.first[:count] 
+					end
+					row << count
+				end
+				row << level
+				row
 		end
 		[headings, rows]
 	end

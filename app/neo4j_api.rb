@@ -322,11 +322,11 @@ class Neo4j
 	end
 	def characters_connected(in_backbone=true)
 		# words of length == 1
-		# How many characters are represented in the backbone
+		# How many characters (words of size 1) are present/absent in the backbone
 		cond = in_backbone ? '' : 'NOT'
 		cypher = "MATCH (w:Word) 
 						  WHERE #{cond} (w)<-[:IS_WORD]-(:Backbone) AND length(w.simp) = 1
-							RETURN count(w.simp) as count, 
+							RETURN count(DISTINCT w.simp) as count, 
 										 w.hsk as level
 							ORDER BY level"
 		graph = @neo.execute_query(cypher)

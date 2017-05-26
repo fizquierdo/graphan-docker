@@ -129,6 +129,49 @@ describe "Queries for index view" do
 		end
 	end
 
+	describe "word_bb_counts and characters_connected" do
+		before(:each) do
+			cypher = "
+			CREATE (:Word{simp:'课', hsk: '1', unique: 'uid'})
+			CREATE (:Word{simp:'课', hsk: '1', unique: 'uid_alt'})
+			CREATE (:Word{simp:'一', hsk: '1', unique: 'uid_1'})
+			CREATE (:Word{simp:'二', hsk: '1', unique: 'uid_1'})
+			CREATE (:Character{simp:'课'})
+			CREATE (:Backbone{simp:'课'})
+			"
+			@neo.run_cypher(cypher)
+			cypher = "
+			MATCH (ch:Character{simp: '课'}), (w:Word{simp: '课'}), (b:Backbone{simp: '课'})
+			CREATE (w)-[:HAS_CHARACTER]->(ch)
+			CREATE (b)-[:IS_CHARACTER]->(ch)
+			CREATE (b)-[:IS_WORD]->(w)
+			"
+			@neo.run_cypher(cypher)
+		end
+		it "counts words per hsk level accessible via backbone" do 
+			ret = @neo.word_bb_counts
+			expect(ret.size).to eq(1)
+			expect(ret.first[:count]).to eq(2)
+			expect(ret.first[:level]).to eq('1')
+		end
+		it "counts characters connected via backbone" do 
+			ret = @neo.characters_connected(true)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:count]).to eq(1)
+		end
+		it "counts characters not connected via backbone" do 
+			ret = @neo.characters_connected(false)
+			expect(ret.size).to eq(1)
+			expect(ret.first[:count]).to eq(2)
+		end
+		it "accounts for different hsk levels" do 
+			cypher = "CREATE (:Word{simp:'三', hsk: '2', unique: 'uid_2'})"
+			@neo.run_cypher(cypher)
+			ret = @neo.characters_connected(false)
+			expect(ret.size).to eq(2)
+		end
+	end
+
 end
 
 

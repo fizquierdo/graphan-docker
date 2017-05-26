@@ -68,13 +68,20 @@ describe "Panel helpers" do
 			@panel = Panel.new @user_counts
 		end
 		it 'returns correct headers' do
-			#headings, _ = @panel.backbone_table([],[], [])
-			#expected = ['chars-in-bb', 'chars-not-repr', 'words-via-bb', 'level']
-			#expect(headings).to match_array(expected)
+			headings, _ = @panel.backbone_table([],[], [])
+			expected = ['chars-in-bb', 'chars-not-repr', 'words-via-bb', 'level']
+			expect(headings).to match_array(expected)
 		end
 		it 'returns correct rows' do
-			#_ , rows = @panel.counts_table
-			#expect(rows.size).to eq(4)
+			_ , rows = @panel.backbone_table([],[],[])
+			expect(rows.size).to eq(@panel.levels.size)
+
+
+			_ , rows = @panel.backbone_table([{count: 5, level: "2"}],[{count: 10, level: "2"}],[])
+			expect(rows.size).to eq(@panel.levels.size)
+			row_level_2 = rows.select{|r| r[3] == "2"}
+			expect(row_level_2.first[0]).to eq(5)
+			expect(row_level_2.first[1]).to eq(10)
 		end
 	end
 
