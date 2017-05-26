@@ -7,20 +7,20 @@ require_relative '../lib/panel'
 describe "Panel helpers" do
 
 	before(:each) do
-		user_counts = [{rel: "IGNORES", level: 1, count: 1}]
-		@panel = Panel.new user_counts
+		@user_counts = [{rel: "IGNORES", level: "1", count: 1}]
 		@states = %w(IGNORES LEARNING KNOWS)
-		@levels = 1.upto(6).to_a
+		@levels = 1.upto(6).to_a.map{|l| l.to_s}
 	end
 
 	describe "Panel initialization" do
 
 		it 'panel has the expected counts' do
+			@panel = Panel.new @user_counts
 			expect(@panel.values.keys).to match_array(@levels)
 			@panel.values.each_pair do |level, level_states|
 				expect(level_states.keys).to match_array(@states)
 				level_states.each_pair do |state, count|
-					if state == "IGNORES" and level == 1
+					if state == "IGNORES" and level == "1"
 						expect(count).to eq(1)
 					else
 						expect(count).to eq(0)
@@ -29,12 +29,26 @@ describe "Panel helpers" do
 			end
 		end
 
+		it 'panel can be initialized when no user is available' do
+			@panel = Panel.new []
+			expect(@panel.values.keys).to match_array(@levels)
+			@panel.values.each_pair do |level, level_states|
+				expect(level_states.keys).to match_array(@states)
+				level_states.each_pair do |state, count|
+						expect(count).to eq(0)
+				end
+			end
+		end
+
 	end
 
 	describe "Counts table" do
+		before (:each) do 
+			@panel = Panel.new @user_counts
+		end
 		it 'returns correct headers' do
 			headings, _ = @panel.counts_table
-			expect(headings).to match_array([:state, 1, 2, 3, 4, 5, 6, :All])
+			expect(headings).to match_array([:state, '1', '2', '3', '4', '5', '6', :All])
 		end
 		it 'returns correct rows' do
 			_ , rows = @panel.counts_table
@@ -48,5 +62,20 @@ describe "Panel helpers" do
 		end
 	end
 
+	
+	describe "Backbone table" do
+		before (:each) do 
+			@panel = Panel.new @user_counts
+		end
+		it 'returns correct headers' do
+			#headings, _ = @panel.backbone_table([],[], [])
+			#expected = ['chars-in-bb', 'chars-not-repr', 'words-via-bb', 'level']
+			#expect(headings).to match_array(expected)
+		end
+		it 'returns correct rows' do
+			#_ , rows = @panel.counts_table
+			#expect(rows.size).to eq(4)
+		end
+	end
 
 end

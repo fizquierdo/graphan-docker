@@ -57,6 +57,7 @@ describe "Queries for index view" do
 
 		it 'returns 1 words as ignore for just created user for top 1' do
 			ret = @neo.words_top('Bob', 'IGNORES', 1)
+			p ret
 			expect(ret.size).to eq(1)
 			w = ret.first
 			expect(w[:simp]).to eq("一")
@@ -76,6 +77,11 @@ describe "Queries for index view" do
 				expect(ret.size).to eq(0)
 				expect(ret.empty?).to be true
 			end
+		end
+
+		it 'returns empty array for unlogged-user' do
+			ret = @neo.words_top('unlogged-user', 'IGNORES', 1)
+			expect(ret.empty?).to be true
 		end
 		# TODO test the ORDER BY aspect of the query
 	end
@@ -97,9 +103,12 @@ describe "Queries for index view" do
 			@neo.run_cypher("CREATE (w:Word{simp:'课', hsk: 1, unique: 'uid'})")
 			@neo.create_user(@user_data)
 		end
+		it 'returns empty array for unlogged-user' do
+			ret = @neo.word_user_counts('unlogged-user')
+			expect(ret.empty?).to be true
+		end
 		it 'returns 1 word and it is ignored' do
 			ret = @neo.word_user_counts('Bob')
-			p ret
 			expect(ret.size).to eq(1)
 			expect(ret.first[:level]).to eq(1)
 			expect(ret.first[:rel]).to eq('IGNORES')

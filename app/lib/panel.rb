@@ -4,8 +4,9 @@ class Panel
 	attr_reader :levels, :states, :values
 
 	def initialize(query_counts)
-		# query_counts <- [{rel: IGNORES|LEARNING|KNOWS, level: HSK_INT, count: INT},{}]
-		@levels = 1.upto(6).to_a
+		p query_counts
+		# query_counts <- [{rel: IGNORES|LEARNING|KNOWS, level: HSK_STR, count: INT},{}]
+		@levels = 1.upto(6).to_a.map{|l| l.to_s}
 		@states = %w(IGNORES LEARNING KNOWS)
 
 	  # @values[level][state] = count

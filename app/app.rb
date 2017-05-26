@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/flash'
 require_relative 'neo4j_api'
 require_relative 'lib/user'
+require_relative 'lib/panel'
 
 ###
 # Config
@@ -33,6 +34,17 @@ helpers do
 		logger.debug "CURRENT user #{username}"
 		username
 	end
+end
+
+def get_top_recommendations(graphan, username)
+	tops = {}
+	%w(LEARNING IGNORES).each do |state|
+		tops[state] = {top1: {}, top5: {}}
+		top5 = graphan.words_top(username, state, 5)
+		tops[state][:top5] = top5
+		tops[state][:top1] = top5.first unless top5.empty?
+	end
+	tops
 end
 
 ###
@@ -105,23 +117,16 @@ end
 get '/' do
 	@username = get_username
 
-	## TODO think what would be a good summary 
-	states = {}
-	%w(KNOWS LEARNING IGNORES).each do |state|
-		states[state] = graphan.words_last_timestamp(@username, state)
-	end
-	@learning_simp = states['LEARNING'][0]
-	@learning_date = states['LEARNING'][1]
-	@known_simp = states['KNOWS'][0]
-	@known_date = states['KNOWS'][1]
+	# Last activity
+	@learning_simp, @learning_date = graphan.words_last_timestamp(@username, 'LEARNING')
+	@known_simp, @known_date = graphan.words_last_timestamp(@username, 'KNOWS')
 
+	# User counts
 	panel = Panel.new graphan.word_user_counts(@username)
 	@count_headings, @count_rows = panel.counts_table
 
 	# Recommendations
-	top_size = 5
-	@learning_top = graphan.words_top(@username, 'LEARNING', top_size)
-	@ignores_top  = graphan.words_top(@username, 'IGNORES', top_size)
+	@tops = get_top_recommendations(graphan, @username)
 
 	# Backbone state (this info is independent of the user, just shows bb-quality)
 	if @username == 'admin'
@@ -133,6 +138,4 @@ get '/' do
 	else
 		@display_bb = false
 	end
-
-	erb :index
-end
+erb :index end
