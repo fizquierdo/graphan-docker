@@ -57,7 +57,6 @@ describe "Queries for index view" do
 
 		it 'returns 1 words as ignore for just created user for top 1' do
 			ret = @neo.words_top('Bob', 'IGNORES', 1)
-			p ret
 			expect(ret.size).to eq(1)
 			w = ret.first
 			expect(w[:simp]).to eq("一")
