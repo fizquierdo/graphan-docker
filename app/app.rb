@@ -59,12 +59,12 @@ post '/signin/?' do
 	# assumes 1 user with that name, and user has a hash 
 	# we will not find any hash for a non-existing user
 	users = graphan.get_users(params[:username])
-	if users.size != 1
+	if users.empty? 
 		hash = nil
 	else
-		hash = users.first["hash"]
+		hash = users.first[:hash]
 	end
-	
+
 	# check if password entered is correct and return username 
 	user = User.authenticate(hash, params)
 	if user.nil? 
