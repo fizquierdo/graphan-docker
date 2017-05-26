@@ -1,0 +1,24 @@
+<% #encoding: UTF-8	%>
+<hr>
+<table class='table'>
+	<thead>
+		<tr>
+			<th>Count</th>
+			<th>Tone</th>
+			<th>Words</th>
+		</tr>
+	</thead>
+	<% @triplets.each do |triplet| %>
+		<% num, known_words, learning_words, tone = triplet %>
+		<tbody>
+			<tr>
+				<td><%= num %></td>
+				<td><%= tone %></td>
+				<td>
+					<span style="color:green;"><%= known_words.join(' ') %></span>
+					<%= learning_words.join(' ') %>
+				</td>
+			</tr>
+		</tbody>
+	<% end %>
+</table>

@@ -1,0 +1,13 @@
+<div class="container-fluid">
+	<div class="row">
+		<% words.each do |w| %>
+			<div class="col-md-3 col-xs-3">
+				<form action="backbone_node" method="GET">
+					<input type="hidden" name="word_unique" value="<%= w[:word_unique] %>">
+					<input type="hidden" name="backbone_id" value="<%= backbone_node_id %>">
+					<input type="submit" class="btn <%=btn_style[w[:word_rel]]%> btn-small " value="<%= w[:word_simp] %>">
+				</form>
+			</div><!-- End of button-word minibox-->
+		<% end %>
+	</div>
+</div><!-- End of words container-fluid-->

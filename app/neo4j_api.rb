@@ -1,6 +1,12 @@
 require 'neography'
 require "csv"
 
+class String
+	def numeric?
+		Float(self) != nil rescue false
+	end
+end
+
 # Example API used by the sinatra app to interact with Neo4j
 # All Cypher queries should be here
 # See spec/neo4j_spec
@@ -331,6 +337,134 @@ class Neo4j
 							ORDER BY level"
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)
+	end
+
+	# Tones
+	def words_grouped_by_tones(username)
+		cypher = "MATCH (:Person {name:'#{username}'})-[rel]->(w:Word)-[:HAS_TONE]->(t:ToneCombo) 
+							RETURN count(w.simp) AS num, 
+                     collect(w.simp) AS words, 
+										 collect (type(rel)) AS states, 
+                     t.tone 
+							ORDER BY num DESC"
+		graph = @neo.execute_query(cypher)
+		triplets = graph["data"]
+
+		# pass the state of the word together with the word
+		edited_triplets = []
+		triplets.each do |t|
+			num, words, states, tone = t 
+			words_by_state = Hash[states.uniq.map{|s|[s,[]]}]
+			words.zip(states).each do |word, state|
+				words_by_state[state] << word
+			end
+			edited_triplets << [num, words_by_state, tone]
+		end
+		edited_triplets
+	end
+
+	def word_details(username, word_unique)
+		# in some cases we are passing a non-sense word_unique (as the id)
+		return {} if word_unique.numeric?
+
+		# Return all details for a single word
+		cypher = "MATCH (:Person{name:'#{username}'})-[r]->(w:Word{unique:'#{word_unique}'})
+							MATCH  (w)-[:HAS_PINYIN]->(p:PinyinWord)
+							RETURN	type(r) as rel, 
+											w.simp as simp, 
+											w.eng as eng, 
+										  w.hsk as level,
+											p.pinyin_tm as pinyin"
+
+		graph = @neo.execute_query(cypher)
+		word = records_to_hashes(graph).first
+		word[:word_unique] = word_unique
+
+		# Return the radicals and backbone related to each char in the word
+		cypher = "MATCH (:Person{name:'#{username}'})-->(w:Word{unique:'#{word_unique}'})
+							MATCH  (w)-[:HAS_CHARACTER]->(ch:Character)
+							OPTIONAL MATCH  (b)-[:IS_CHARACTER]->(ch)
+							OPTIONAL MATCH  (ch)-[:HAS_RADICAL]->(r:Radical)
+							RETURN	ch.simp as char, 
+											collect(r.simp) as radicals, 
+		                  b.backbone_id as backbone_id"
+		graph = @neo.execute_query(cypher)
+		chars = records_to_hashes(graph)
+
+		# hash the chars by character for easier manipulation
+		word[:chars] = Hash[chars.map{|h| [h[:char], h]}]
+
+		word
+	end
+
+	# Backbone
+	def backbone(username)
+		cypher="MATCH (b:Backbone)-[:NEXT]->(:Backbone)
+						OPTIONAL MATCH (b)-[:IS_WORD]->(w:Word)<-[rel]-(:Person{name:'#{username}'})
+						OPTIONAL MATCH (b)-[:IS_CHARACTER]->(ch:Character)
+						RETURN b.backbone_id as backbone_id, 
+									 b.simp as simp, 
+									 collect(w.unique) as words_unique, 
+									 collect(type(rel)) as words_rel,
+									 ch.freq_rank as char_freq_rank
+						ORDER BY toInt(backbone_id)"
+
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+
+	def backbone_node(username, bid)
+		# composites
+		cypher = "MATCH (ch)<-[:IS_CHARACTER]-(b:Backbone{backbone_id:'#{bid}'})
+							MATCH (b)-[:PART_OF]->(composite:Backbone)
+							RETURN composite.simp as simp, 
+										 composite.backbone_id as backbone_id"
+		graph = @neo.execute_query(cypher)
+		composites = records_to_hashes(graph)
+
+		# parts and char_simp 
+		cypher = "MATCH (ch)<-[:IS_CHARACTER]-(b:Backbone{backbone_id:'#{bid}'})
+							OPTIONAL MATCH (b)<-[:PART_OF]-(part:Backbone)
+							RETURN ch.simp, ch.freq_rank, part.simp, part.backbone_id"
+		graph = @neo.execute_query(cypher)
+		if graph["data"][0].nil?
+			# special case where there are no words that contain the character 
+			char_simp = ''
+			freq_rank = -1
+			parts = []
+			words = []
+			return {backbone_id: bid, simp: char_simp, freq_rank: freq_rank, parts: parts, composites: composites, words: words}
+		else
+			char_simp  = graph["data"][0][0]
+			freq_rank  = graph["data"][0][1]
+			parts = graph["data"].map {|r| {simp: r[2], backbone_id: r[3]}}
+			parts = parts.select{|p| p[:simp] != char_simp} unless parts.empty?
+			parts = [] if parts.size == 1 && parts.first[:simp].nil? 
+		end
+
+		# words
+		cypher = "MATCH (ch)<-[:IS_CHARACTER]-(b:Backbone{backbone_id:'#{bid}'})
+							MATCH (ch)<-[:HAS_CHARACTER]-(w:Word)<-[rel]-(:Person{name:'#{username}'})
+							RETURN w.unique as word_unique, 
+										 w.simp as word_simp, 
+										 type(rel) as word_rel, 
+										 w.hsk as level
+							ORDER BY level, length(word_simp)"
+		graph = @neo.execute_query(cypher)
+		words = records_to_hashes(graph)
+
+		# all together
+		{backbone_id: bid, simp: char_simp, freq_rank: freq_rank, parts: parts, composites: composites, words: words}
+	end
+
+	# Knowledge
+	def update_known_relationship(username, word_unique, r_old, r_new)
+		# remove one relationship and substitute it for the new status
+		cypher = "MATCH (:Person {name:'#{username}'})-[r:#{r_old}]->(w:Word{unique:'#{word_unique}'}) DELETE r"
+		@neo.execute_query(cypher)
+		cypher = "MATCH (u:Person {name:'#{username}'}), (w:Word {unique:'#{word_unique}'})
+							CREATE UNIQUE (u)-[:#{r_new}{date: TIMESTAMP()}]->(w)"
+		@neo.execute_query(cypher)
 	end
 
 	private

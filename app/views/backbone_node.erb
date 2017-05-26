@@ -1,0 +1,107 @@
+<% #encoding: UTF-8	%>
+
+
+<% btn_class_style = {"LEARNING" => "btn-warning", "IGNORES" => "btn-danger", "KNOWS" => "btn-success" }	%>
+
+<% unless @backbone_node.empty? %>
+	<!-- backbone window -->
+	<hr>
+	<div class='row'>
+		<% unless @backbone_window.empty? %>
+			<% @backbone_window.each do |b| %>
+				<% if b[:words_rel].nil? %>
+					<% btn_class="btn-default" %>
+				<% else %>
+					<% btn_class=btn_class_style[b[:words_rel].first] %>
+				<% end %>
+				<% if b[:backbone_id] == @backbone_node[:backbone_id] %>
+					<% btn_class="btn-primary disabled" %>
+				<% end %>
+				<div class="col-xs-2">
+					<form action="backbone_node" method="GET">
+						<input type="hidden" name="backbone_id" value="<%= b[:backbone_id] %>">
+						<button type="submit" class="btn btn-small btn-block <%=btn_class%>">
+							<%= b[:simp] %><span class="glyphicon glyphicon-chevron-right"></span>
+						</button>
+
+					</form>
+				</div>
+			<% end %>
+		<% end %>
+	</div> <!-- End of backbone window row -->
+
+	<!-- character and words panels panels row -->
+	<hr>
+	<div class="row">
+		<!-- character panel -->
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-heading text-center">
+					Character <%= @backbone_node[:backbone_id] %> 
+					, freq rank <%= @backbone_node[:freq_rank] %> 
+					<h1><%= @backbone_node[:simp] %></h1>
+				</div>
+				<div class="panel-body">
+
+					<div class="container-fluid">
+						<div class="row">
+
+							<div class="col-md-3 col-xs-3">
+								<p>Parts</p>
+								<%= erb :'partials/_backbone_related_nodes', layout: false, locals: {nodes: @backbone_node[:parts]} %>
+							</div>
+							<div class="col-md-3 col-xs-3">
+								<p>Composites</p>
+								<%= erb :'partials/_backbone_related_nodes', layout: false, locals: {nodes: @backbone_node[:composites]} %>
+							</div>
+							<div class="col-md-6 col-xs-6">
+								<p>Words</p>
+								<%= erb :'partials/_backbone_related_words', layout: false, 
+									locals: {words: @backbone_node[:words], backbone_node_id: @backbone_node[:backbone_id], btn_style: btn_class_style} %>
+								</div>
+
+							</div><!--End of row -->
+						</div><!--End of container-fluid -->
+
+
+					</div><!--End of panel-body -->
+				</div><!--End of panel -->
+			</div><!--End of character col -->
+
+			<!-- word details panel, only shown if any word_details have been passed -->
+			<div class="col-md-6">
+				<% unless @word_details.empty? %>
+					<div class="panel panel-default">
+						<div class="panel-heading text-center">Word <h1><%= @word_details[:simp] %></h1></div>
+						<div class="panel-body">
+							<% locals={word: @word_details,backbone_node_id: @backbone_node[:backbone_id],ordered_chars: @ordered_chars} %>
+							<%= erb :'partials/_word_details', layout: false, locals: locals %>
+						</div><!--End of panel-body -->
+					</div><!--End of panel -->
+				<% end %>
+			</div>
+
+		</div><!--End of row -->
+
+	<% end %><!-- End of backbone node -->
+
+	<!-- Show recommendations on what to learn next so we dont need to go back to the full backbone -->
+	<!-- Word recommendation tables -->
+	<hr>
+	<div class="container-fluid">
+		<div class="row">
+
+			<!-- LEARNING top 5 -->
+			<div class="col-md-6">
+				<h4>Top words under study</h4>
+				<%= erb :'partials/_recommendation', layout: false, locals: {words: @learning_top } %>
+			</div><!-- End col -->
+
+			<!-- IGNORES top 5  -->
+			<div class="col-md-6">
+				<h4> New Words (currently not studying) </h4>
+				<%= erb :'partials/_recommendation', layout: false, locals: {words: @ignores_top } %>
+			</div><!-- End col -->
+
+		</div><!-- End row -->
+	</div><!-- End Container -->

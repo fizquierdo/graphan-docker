@@ -1,0 +1,58 @@
+.thumbnail{
+	background-color: #fcf8e3;
+	border-radius: 20px;
+	border-color: #eee;
+	padding: 30px;
+	margin-bottom: 20px;
+}
+
+.recommendation .btn-md{
+	font-size: 20px;
+}
+
+/* hide stuff int he recommendations */
+.hidden {
+	display:none;
+}
+
+#controls p{
+	cursor: pointer;
+}
+
+
+/* word box model */
+.word{
+	display: inline-block;
+	cursor: pointer;
+	margin-bottom: 20px;
+}
+
+/* borders can be used to highlight level or knowledge */
+/*
+.word.hsk1 {
+	border-bottom: 3px solid #e5e5e5;
+}
+*/
+.word.knows {
+	border-bottom: 3px solid #D0E9C6;
+}
+.word.ignores {
+	border-bottom: 3px solid #FA8072
+}
+.word.learning {
+	border-bottom: 3px solid #fcf8e3;
+}
+
+.pinyin{
+	font-size: x-small;
+	text-align: center;
+	color: #aaa;
+}
+.hanzi{
+	font-size: x-large;
+	text-align: center;
+}
+
+/* toggle pinyin content */
+.pinyin-content{
+}

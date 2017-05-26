@@ -4,6 +4,7 @@
 		<meta charset='UTF-8' />
 		<title>Graphan</title>
 		<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel='stylesheet' />
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 	<body class='container-fluid'>
 
@@ -12,6 +13,8 @@
 			<ul class="nav nav-pills">
 				<!--Navigation generic -->
 				<li><a href="/"					>Home</a></li>
+				<li><a href="/backbone"	>Backbone</a></li>
+				<li><a href="/tonelist"	>Tones</a></li>
 
 				<!--Navigation signin-out-up -->
 				<% if session[:user] %>
@@ -37,6 +40,10 @@
 		<!--End of notification -->
 
 		<%= yield %>
+
+		<!--Additional javascript -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<!--End of additional javascript -->
 
 	</body>
 </html>

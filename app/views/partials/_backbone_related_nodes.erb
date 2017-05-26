@@ -1,0 +1,10 @@
+<% nodes.each do |b| %>
+	<% if b[:backbone_id].numeric? %>
+		<form action="backbone_node" method="GET">
+			<input type="hidden" name="backbone_id" value="<%= b[:backbone_id].to_i %>">
+			<input type="submit" class="btn btn-default btn-small" value=" <%= b[:simp] %>">
+		</form>
+	<% else %>
+		<%= b["simp"] %>
+	<% end %>
+<% end %>

@@ -1,0 +1,22 @@
+<% #encoding: UTF-8	%>
+<% btn_class_style = {"LEARNING" => "btn-warning", "IGNORES" => "btn-danger", "KNOWS" => "btn-success" }	%>
+
+<hr>
+<% @backbone.each do |b| %>
+	<!-- 1 button per related workd or just a representative button? -->
+	<% if b[:words_rel].nil? %>
+		<% btn_class="btn-default" %>
+	<% else %>
+		<% btn_class=btn_class_style[b[:words_rel].first] %>
+	<% end %>
+	<div class="row">
+		<div class="col-md-1 col-xs-1"><%= b[:backbone_id] %></div>
+		<div class="col-md-1 col-xs-1"><%= b[:char_freq_rank] %></div>
+		<div class="col-md-2 col-xs-2 recommendation">
+			<form action="backbone_node" method="GET">
+				<input type="hidden" name="backbone_id" value="<%= b[:backbone_id] %>">
+				<input type="submit" class="btn <%=btn_class%> btn-md btn-block" value="<%= b[:simp] %>">
+			</form>
+		</div>
+	</div>
+<% end %>

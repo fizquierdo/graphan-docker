@@ -24,6 +24,11 @@ def import_backbone
 		backbone_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/backbone.csv"
 		@neo.add_backbone(backbone_url)
 end
+def add_freq_ranks_to_characters
+		char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/character_frequency.tsv"
+		@neo.add_freq_rank_to_characters(char_ranks_url)
+end
+
 
 describe "Neo4j-API integration" do
 
@@ -35,6 +40,82 @@ describe "Neo4j-API integration" do
 		expect(@neo.count_nodes).to equal(0)
 	end
 
+end
+
+describe "Queries for tone list" do
+	before(:each) do
+		init_test_db
+		import_words
+		@neo.create_tone_combos_from_words
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+		@neo.create_user(@user_data)
+	end
+	describe "words grouped by tones" do
+		it "returns edited triplets with num, words_by_state, tone" do
+			# tone 44 and 4 single tones
+			ret = @neo.words_grouped_by_tones('Bob')
+			expect(ret.size).to eq(5)
+			# all arrays have 3 elements
+			expect(ret.map{|l| l.size}.uniq.first).to eq(3)
+		end
+		it "groups words by state" do
+			# tone 44 and 4 single tones
+			ret = @neo.words_grouped_by_tones('Bob')
+			tone_44 = ret.select{|a| a[2] == "44"}.first
+			expect(tone_44[1].has_key? ("IGNORES")).to be true
+			expect(tone_44[1]["IGNORES"].first).to eq("正在")
+		end
+	end
+end
+
+describe "Queries for backbone" do
+	before(:each) do
+		init_test_db
+		import_words
+		@neo.create_characters_from_words
+		add_freq_ranks_to_characters
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+		@neo.create_user(@user_data)
+		import_backbone
+	end
+
+	describe "backbone" do
+		it "returns complete backbone" do
+			ret = @neo.backbone('Bob')
+			expect(ret.size).to eq(12)
+		end
+		it "returns backbone entries ordered by ID" do
+			ret = @neo.backbone('Bob')
+			expect(ret.first[:simp]).to eq('一')
+			expect(ret.first[:backbone_id]).to eq('1')
+			expect(ret.last[:simp]).to eq('人')
+			expect(ret.last[:backbone_id]).to eq('12')
+		end
+		it "relationship with word if available" do
+			ret = @neo.backbone('Bob')
+			yi_node = ret.select{|b| b[:simp] == '一'}.first
+			expect(yi_node[:words_rel].first).to eq("IGNORES")
+		end
+	end
+
+	describe "backbone node" do
+		it "returns single backbone node" do
+			ret = @neo.backbone_node('Bob', '1')
+			expect(ret[:backbone_id]).to eq('1')
+			expect(ret[:simp]).to eq('一')
+		end
+		it "returns related word status" do
+			ret = @neo.backbone_node('Bob', '1')
+			p ret
+			expect(ret[:words].size).to eq(1)
+			w = ret[:words].first
+			expect(w[:word_rel]).to eq('IGNORES')
+			expect(w[:level]).to eq('1')
+			expect(w[:word_simp]).to eq('一')
+			expect(w[:word_unique]).to eq('一(yi1)')
+		end
+		# TODO add tests for parts, freq_rank, composites
+	end
 end
 
 describe "Queries for index view" do
@@ -352,9 +433,8 @@ describe "Neo4j DB seeds" do
 			expect(ret.map{|b| b[:simp]}).to match_array(%w(正 在))
 		end
 		it 'freq ranks can be added to characters' do
-			char_ranks_url = "https://raw.githubusercontent.com/fizquierdo/graphan-docker/master/app/spec/data/character_frequency.tsv"
 			@neo.create_characters_from_words
-			@neo.add_freq_rank_to_characters(char_ranks_url)
+			add_freq_ranks_to_characters
 			cypher = "
 			MATCH (ch:Character) 
 			RETURN ch.simp as simp, ch.freq_rank as rank"

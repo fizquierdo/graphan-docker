@@ -34,6 +34,27 @@ helpers do
 		logger.debug "CURRENT user #{username}"
 		username
 	end
+	def backbone_window(backbone, backbone_id, window_size=3)
+		start_offset = 1
+		idx = backbone_id.to_i - 1 - start_offset
+		prev_idx = [0, idx-window_size].max + 1
+		post_idx = [backbone.size-1, idx+window_size].min
+		return backbone[prev_idx..post_idx]
+	end
+
+	def order_chars_from_word_details(word_details)
+		ordered_chars = []
+		word_details[:simp].split(//).each do |char|
+				radicals    = word_details[:chars][char][:radicals]
+				backbone_id = word_details[:chars][char][:backbone_id]
+				ordered_chars << [char, radicals, backbone_id] 
+		end
+		ordered_chars
+	end
+
+	def escaped_query(params)
+		URI.escape(params.map{|k, v| "#{k}=#{v}"}.join('&'))
+	end
 end
 
 def get_top_recommendations(graphan, username)
@@ -138,4 +159,58 @@ get '/' do
 	else
 		@display_bb = false
 	end
-erb :index end
+
+	erb :index 
+end
+
+get '/tonelist' do 
+	@username = get_username
+	triplets = graphan.words_grouped_by_tones(@username)
+	@triplets = triplets.map do |num, words, tone|
+		known_words = words["KNOWS"] || []
+		learning_words = words["LEARNING"] || []
+		[num, known_words, learning_words, tone]
+	end
+	erb :tonelist
+end
+
+get '/backbone_node' do 
+	@username = get_username
+	raise "Missing backbone_id in #{params}" unless params["backbone_id"]
+
+	@backbone_node   = graphan.backbone_node(@username, params["backbone_id"])
+	@backbone_window = backbone_window(graphan.backbone(@username), params["backbone_id"])
+	@learning_top = graphan.words_top(@username, 'LEARNING', 5)
+	@ignores_top  = graphan.words_top(@username, 'IGNORES', 5)
+	if params["word_unique"]
+		@word_details  = graphan.word_details(@username, params["word_unique"])
+		@ordered_chars = order_chars_from_word_details(@word_details)
+	else
+		@word_details  = []
+	end
+	erb :backbone_node
+end
+
+get '/backbone' do 
+	@backbone = graphan.backbone(get_username)
+	erb :backbone
+end
+
+# in backbone
+post '/learning_word' do
+	graphan.update_known_relationship(session[:user], params["word_unique"], 'IGNORES', 'LEARNING')
+	redirect to("/backbone_node?#{escaped_query(params)}")
+end
+post '/learnt_word' do
+	graphan.update_known_relationship(session[:user], params["word_unique"], 'LEARNING', 'KNOWS')
+	redirect to("/backbone_node?#{escaped_query(params)}")
+end
+post '/forgot_word' do
+	graphan.update_known_relationship(session[:user], params["word_unique"], 'KNOWS', 'LEARNING')
+	redirect to("/backbone_node?#{escaped_query(params)}")
+end
+
+# in home
+get '/follow_recommendation' do
+	redirect to("/backbone_node?#{escaped_query(params)}")
+end
