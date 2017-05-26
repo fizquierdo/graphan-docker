@@ -16,7 +16,7 @@ script:
   - rspec -f d spec
 
 after_success:
-  - codeclimate-test-reporter
+  - codeclimate-test-reporter app/coverage/.resultset.json
   - docker-compose stop
 
 after_failure:
