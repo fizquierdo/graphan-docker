@@ -53,10 +53,47 @@ class Neo4j
 		CREATE (p)-[:IGNORES{date: TIMESTAMP()}]->(w)"
 		@neo.execute_query(cypher)
 	end
+	
+	#### 
+	# Export 
+	#
+
+	def export_users(filename)
+		cypher = "MATCH (p:Person) RETURN p.name as name, p.hash as hash"
+		export(filename, cypher)
+	end
+
+	def export_users_rels(filename)
+		cypher = "MATCH (p:Person)-[r]->(w:Word) 
+		         RETURN p.name as person_name,
+		                type(r) as rel, 
+		                r.date as timestamp, 
+		                w.unique as word_unique"
+		export(filename, cypher)
+	end
 
 	#### 
 	# Import 
 	#
+	
+	def import_users(filename)
+		users = CSV.read(filename, headers: true, skip_blanks: true)
+		users.each do |u|
+			node = @neo.create_node(name: u["name"], hash: u["hash"])
+			@neo.add_label(node, "Person")
+		end
+	end
+	def import_users_rels(filename)
+		users_rels = CSV.read(filename, headers: true, skip_blanks: true)
+		users_rels.each do |row|
+			 query =  "
+				MATCH (p:Person{name: '#{row['person_name']}'}), 
+							(w:Word{unique: '#{row['word_unique']}' })
+				CREATE UNIQUE (p)-[:#{row['rel']}{date: #{row['timestamp']}}]->(w)"
+			 @neo.execute_query(query)
+		end
+	end
+
 	def add_pinyin_blocks(filename)
 		# Add all possible pinyin sounds from a table file in csv format
 		pinyin = CSV.read(filename, headers: true)
@@ -473,6 +510,14 @@ class Neo4j
 		headers = graph["columns"]
 		graph["data"].map do |r|
 			Hash[headers.each_with_index.map{|col, i| [col.to_sym, r[i]]}]
+		end
+	end
+
+	def export(filename, cypher)
+		graph = @neo.execute_query(cypher)
+		CSV.open(filename, "w") do |csv|
+			csv << graph["columns"]
+			graph["data"].each {|d| csv << d}
 		end
 	end
 

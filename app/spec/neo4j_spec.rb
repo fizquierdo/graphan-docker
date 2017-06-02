@@ -106,7 +106,6 @@ describe "Queries for backbone" do
 		end
 		it "returns related word status" do
 			ret = @neo.backbone_node('Bob', '1')
-			p ret
 			expect(ret[:words].size).to eq(1)
 			w = ret[:words].first
 			expect(w[:word_rel]).to eq('IGNORES')
@@ -254,6 +253,92 @@ describe "Queries for index view" do
 
 end
 
+describe "Neo4j exports/imports" do
+	before(:each) do
+		init_test_db
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+	end
+	describe "Data can be imported from file" do
+		before(:each) do
+			path = File.join(File.dirname(__FILE__), 'data/user_db.csv')
+			@neo.import_users(path)
+		end
+
+		it 'Users can be imported' do
+			users = @neo.get_users('Alice')
+			expect(users.size).to equal(1)
+			user = users.first
+			expect(user[:name]).to eq('Alice')
+			expect(user[:hash]).to eq('$hashtest')
+		end
+
+		it 'Users rels can be imported' do
+			@neo.run_cypher("CREATE (w:Word{unique:'几(ji3)', simp: '几'})")
+			path = File.join(File.dirname(__FILE__), 'data/user_db_rels.csv')
+			@neo.import_users_rels(path)
+			simp, date = @neo.words_last_timestamp('Alice', 'IGNORES')
+			expect(simp).to eq('几')
+			expect(date).to eq('2017-01-28')
+		end
+
+	end
+
+	describe "Data can be exported to file" do
+		before(:each) do
+			@fname = "exported_file.csv"
+		end
+
+		it 'File can be exported' do
+			@neo.export_users(@fname)
+			lines = File.open(@fname).readlines
+			expect(lines.size).to eq(1)
+			k1, k2 = lines.first.chomp.split(',')
+			expect(k1).to eq('name')
+			expect(k2).to eq('hash')
+		end
+
+		it 'User file can be exported' do
+			@neo.create_user(@user_data)
+			@neo.export_users(@fname)
+			lines = File.open(@fname).readlines
+			expect(lines.size).to eq(2)
+			name, hash = lines.last.chomp.split(',')
+			expect(name).to eq('Bob')
+			expect(hash).to eq('hashedvalue')
+		end
+
+		it 'User without relationships can be exported' do
+			@neo.export_users_rels(@fname)
+			lines = File.open(@fname).readlines
+			expect(lines.size).to eq(1)
+			k1, k2, k3, k4 = lines.last.chomp.split(',')
+			expect(k1).to eq('person_name')
+			expect(k2).to eq('rel')
+			expect(k3).to eq('timestamp')
+			expect(k4).to eq('word_unique')
+		end
+
+		it 'User with relationships can be exported' do
+			@neo.run_cypher("CREATE (w:Word{simp:'hey', unique: 'heya'})")
+			@neo.create_user(@user_data)
+			@neo.export_users_rels(@fname)
+			lines = File.open(@fname).readlines
+			expect(lines.size).to eq(2)
+			person_name, rel, timestamp, word_unique = lines.last.chomp.split(',')
+			date = Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d")
+
+			expect(person_name).to eq('Bob')
+			expect(rel).to eq('IGNORES')
+			expect(date).to eq(Time.now.strftime("%Y-%m-%d"))
+			expect(word_unique).to eq('heya')
+		end
+
+		after(:each) do
+			File.delete(@fname)
+		end
+	end
+
+end
 
 describe "Neo4j User management" do
 

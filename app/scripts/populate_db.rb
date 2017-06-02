@@ -35,3 +35,9 @@ neo.link_characters_to_radicals(data_url+"hsk_radicals.csv")
 # Backbone
 puts "Add backbone nodes"
 neo.add_backbone(data_url+"backbone.csv")
+
+## Import existing user data
+#puts "Importing user data"
+#neo.import_users("data/exports/user_db.csv")
+#puts "Importing user data rels"
+#neo.import_users_rels("data/exports/user_db_rels.csv")
