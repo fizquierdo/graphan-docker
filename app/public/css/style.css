@@ -6,8 +6,12 @@
 	margin-bottom: 20px;
 }
 
+/* custom sizes for recommendation boxes and word details */
 .recommendation .btn-md{
-	font-size: 20px;
+	font-size: 40px;
+}
+.other-word-details{
+	font-size: 30px;
 }
 
 /* hide stuff int he recommendations */
