@@ -10,8 +10,8 @@
 		<% btn_class=btn_class_style[b[:words_rel].first] %>
 	<% end %>
 	<div class="row">
-		<div class="col-md-1 col-xs-1"><%= b[:backbone_id] %></div>
-		<div class="col-md-1 col-xs-1"><%= b[:char_freq_rank] %></div>
+		<div class="col-md-1 col-xs-1 font-lg"><%= b[:backbone_id] %></div>
+		<div class="col-md-1 col-xs-1 font-lg"><%= b[:char_freq_rank] %></div>
 		<div class="col-md-2 col-xs-2 recommendation">
 			<form action="backbone_node" method="GET">
 				<input type="hidden" name="backbone_id" value="<%= b[:backbone_id] %>">

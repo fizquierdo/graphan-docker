@@ -20,7 +20,7 @@
 				<div class="col-xs-2">
 					<form action="backbone_node" method="GET">
 						<input type="hidden" name="backbone_id" value="<%= b[:backbone_id] %>">
-						<button type="submit" class="btn btn-small btn-block <%=btn_class%>">
+						<button type="submit" class="btn btn-lg btn-block <%=btn_class%>">
 							<%= b[:simp] %><span class="glyphicon glyphicon-chevron-right"></span>
 						</button>
 
@@ -37,9 +37,11 @@
 		<div class="col-md-6">
 			<div class="panel panel-default">
 				<div class="panel-heading text-center">
+					<h4>
 					Character <%= @backbone_node[:backbone_id] %> 
 					, freq rank <%= @backbone_node[:freq_rank] %> 
-					<h1><%= @backbone_node[:simp] %></h1>
+					</h4>
+					<p class="font-huge"><%= @backbone_node[:simp] %></p>
 				</div>
 				<div class="panel-body">
 
@@ -72,7 +74,7 @@
 			<div class="col-md-6">
 				<% unless @word_details.empty? %>
 					<div class="panel panel-default">
-						<div class="panel-heading text-center">Word <h1><%= @word_details[:simp] %></h1></div>
+						<div class="panel-heading text-center"> <p class="font-huge"><%= @word_details[:simp] %></p></div>
 						<div class="panel-body">
 							<% locals={word: @word_details,backbone_node_id: @backbone_node[:backbone_id],ordered_chars: @ordered_chars} %>
 							<%= erb :'partials/_word_details', layout: false, locals: locals %>
