@@ -91,7 +91,7 @@ end
 def get_top_recommendations(graphan, username)
 	tops = {}
 	%w(LEARNING IGNORES).each do |state|
-		tops[state] = {top1: {}, top5: {}}
+		tops[state] = {top1: {}, top5: []}
 		top5 = graphan.words_top(username, state, 5)
 		tops[state][:top5] = top5
 		tops[state][:top1] = top5.first unless top5.empty?

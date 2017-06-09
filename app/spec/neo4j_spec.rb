@@ -175,6 +175,13 @@ describe "Queries for index view" do
 			expect(simp).to eq('课')
 			expect(date).to eq(Time.now.strftime("%Y-%m-%d"))
 		end
+		it 'returns no simplified character and oldest date' do
+			%w(LEARNING KNOWS).each do |state|
+				simp, date = @neo.words_last_timestamp('Bob', state)
+				expect(simp).to be nil
+				expect(date).to eq("1970-01-01")
+			end
+		end
 	end
 
 	describe "word_user_counts" do

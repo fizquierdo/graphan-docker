@@ -10,8 +10,12 @@
 				<div class="thumbnail">
 					<p>Hello <%= @username %>, your latest activities:</p>
 					<ul>
-						<li> <%= @learning_date %> started to study <%= @learning_simp %> </li>
-						<li> <%= @known_date %> learnt <%= @known_simp %> </li>
+						<% unless @leaning_simp.nil? %>
+							<li> <%= @learning_date %> started to study <%= @learning_simp %> </li>
+						<% end %>
+						<% unless @known_simp.nil? %>
+							<li> <%= @known_date %> learnt <%= @known_simp %> </li>
+						<% end %>
 						<li> Keep it going	加油</li>
 					</ul>
 					<hr>
@@ -35,83 +39,83 @@
 				<%= erb :'partials/_recommendation', 
 					layout: false, 
 					locals: {words: @tops["LEARNING"][:top5], msg: "Top words under study" } %>
-			</div><!-- End col -->
+				</div><!-- End col -->
 
-			<!-- IGNORES top 5  -->
-			<div class="col-md-4">
-				<%= erb :'partials/_recommendation', 
-					layout: false, 
-					locals: {words: @tops["IGNORES"][:top5], msg: "New words (currently not studying)" } %>
-			</div><!-- End col -->
+				<!-- IGNORES top 5  -->
+				<div class="col-md-4">
+					<%= erb :'partials/_recommendation', 
+						layout: false, 
+						locals: {words: @tops["IGNORES"][:top5], msg: "New words (currently not studying)" } %>
+					</div><!-- End col -->
 
-		</div><!-- End row -->
-	</div><!-- End Container -->
+				</div><!-- End row -->
+			</div><!-- End Container -->
 
 
-	<!-- Show panel as a table -->
-	<div class="container-fluid">
-		<% statemap = {'IGNORES' => 'danger', 'LEARNING' => 'warning', 'KNOWS' => 'success', 'Total' => 'default'} %>
+			<!-- Show panel as a table -->
+			<div class="container-fluid">
+				<% statemap = {'IGNORES' => 'danger', 'LEARNING' => 'warning', 'KNOWS' => 'success', 'Total' => 'default'} %>
 
-		<!-- @panel_values -->
-		<hr>
-		<h4>Word counts</h4>
-		<table class='table table-hover table-striped table-responsive font-md'>
-			<thead>
-				<tr>
-					<% @count_headings.each do |level| %>
-						<th><%= level %></th>
-					<% end %>
-				</tr>
-			</thead>
-			<tbody>
-				<% @count_rows.each do |row| %>
-					<% state = row.first %>
-					<tr class = <%= statemap[state] %>>
-						<td><%= state %></td>
-						<% row[1..row.size].each do |value| %>
-							<td><%= value %></td>
-						<% end %>
-					</tr>
-				<% end %>
-			</tbody>
-		</table>
-		<!-- end panel table -->
-	</div><!-- End Container -->
-	<div class="container-fluid">
-
-		<% if @display_bb  %>
-			<!-- backbone-completeness table -->
-			<hr>
-			<h4>Current backbone completeness [Work-in-Progress]</h4>
-			<table class='table table-condensed'>
-				<thead>
-					<tr>
-						<% @bb_headings.each do |header| %>
-							<th><%= header %></th>
-						<% end %>
-					</tr>
-				</thead>
-				<tbody>
-					<% @bb_rows.each do |row| %>
+				<!-- @panel_values -->
+				<hr>
+				<h4>Word counts</h4>
+				<table class='table table-hover table-striped table-responsive font-md'>
+					<thead>
 						<tr>
-							<% row.each do |value| %>
-								<td><%= value %></td>
+							<% @count_headings.each do |level| %>
+								<th><%= level %></th>
 							<% end %>
 						</tr>
-					<% end %>
-				</tbody>
-			</table>
-			<!-- end backbone-completeness table -->
+					</thead>
+					<tbody>
+						<% @count_rows.each do |row| %>
+							<% state = row.first %>
+							<tr class = <%= statemap[state] %>>
+								<td><%= state %></td>
+								<% row[1..row.size].each do |value| %>
+									<td><%= value %></td>
+								<% end %>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+				<!-- end panel table -->
+			</div><!-- End Container -->
+			<div class="container-fluid">
+
+				<% if @display_bb  %>
+					<!-- backbone-completeness table -->
+					<hr>
+					<h4>Current backbone completeness [Work-in-Progress]</h4>
+					<table class='table table-condensed'>
+						<thead>
+							<tr>
+								<% @bb_headings.each do |header| %>
+									<th><%= header %></th>
+								<% end %>
+							</tr>
+						</thead>
+						<tbody>
+							<% @bb_rows.each do |row| %>
+								<tr>
+									<% row.each do |value| %>
+										<td><%= value %></td>
+									<% end %>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+					<!-- end backbone-completeness table -->
+				<% end %>
+
+			</div><!-- End Container -->
+
+		<% else %>
+			<div class="jumbotron">
+				<p>
+				<a href="/signin" >Sign in</a> if you have an account 
+				or <a href="/signup" >Sign up</a> to create one and start learning.
+				</p>
+			</div>
 		<% end %>
-
-	</div><!-- End Container -->
-
-<% else %>
-	<div class="jumbotron">
-		<p>
-		<a href="/signin" >Sign in</a> if you have an account 
-		or <a href="/signup" >Sign up</a> to create one and start learning.
-		</p>
-	</div>
-<% end %>
 
