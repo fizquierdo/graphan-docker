@@ -6,7 +6,7 @@
 <% unless @backbone_node.empty? %>
 	<!-- backbone window -->
 	<hr>
-	<div class='row backbone_window'>
+	<div class="row">
 		<% unless @backbone_window.empty? %>
 			<% @backbone_window.each do |b| %>
 				<% if b[:words_rel].nil? %>
@@ -20,7 +20,7 @@
 				<div class="col-xs-2">
 					<form action="backbone_node" method="GET">
 						<input type="hidden" name="backbone_id" value="<%= b[:backbone_id] %>">
-						<button type="submit" class="btn btn-lg btn-block <%=btn_class%>">
+						<button type="submit" class="btn btn-lg btn-block font-lg <%=btn_class%>">
 							<%= b[:simp] %>
 						</button>
 
