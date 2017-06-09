@@ -7,7 +7,6 @@
 		<div class="row">
 
 			<div class="col-md-4">
-				<h4>Graphan</h4>
 				<div class="thumbnail">
 					<p>Hello <%= @username %>, your latest activities:</p>
 					<ul>
@@ -33,14 +32,16 @@
 
 			<!-- LEARNING top 5 -->
 			<div class="col-md-4">
-				<h4>Top words under study</h4>
-				<%= erb :'partials/_recommendation', layout: false, locals: {words: @tops["LEARNING"][:top5] } %>
+				<%= erb :'partials/_recommendation', 
+					layout: false, 
+					locals: {words: @tops["LEARNING"][:top5], msg: "Top words under study" } %>
 			</div><!-- End col -->
 
 			<!-- IGNORES top 5  -->
 			<div class="col-md-4">
-				<h4> New Words (currently not studying) </h4>
-				<%= erb :'partials/_recommendation', layout: false, locals: {words: @tops["IGNORES"][:top5] } %>
+				<%= erb :'partials/_recommendation', 
+					layout: false, 
+					locals: {words: @tops["IGNORES"][:top5], msg: "New words (currently not studying)" } %>
 			</div><!-- End col -->
 
 		</div><!-- End row -->
@@ -54,7 +55,7 @@
 		<!-- @panel_values -->
 		<hr>
 		<h4>Word counts</h4>
-		<table class='table table-hover table-striped'>
+		<table class='table table-hover table-striped table-responsive font-md'>
 			<thead>
 				<tr>
 					<% @count_headings.each do |level| %>

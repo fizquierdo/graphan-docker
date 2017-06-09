@@ -95,14 +95,12 @@
 
 			<!-- LEARNING top 5 -->
 			<div class="col-md-6">
-				<h4>Top words under study</h4>
-				<%= erb :'partials/_recommendation', layout: false, locals: {words: @learning_top } %>
+				<%= erb :'partials/_recommendation', layout: false, locals: {words: @learning_top, msg: "Studying"} %>
 			</div><!-- End col -->
 
 			<!-- IGNORES top 5  -->
 			<div class="col-md-6">
-				<h4> New Words (currently not studying) </h4>
-				<%= erb :'partials/_recommendation', layout: false, locals: {words: @ignores_top } %>
+				<%= erb :'partials/_recommendation', layout: false, locals: {words: @ignores_top, msg: "New Words"} %>
 			</div><!-- End col -->
 
 		</div><!-- End row -->

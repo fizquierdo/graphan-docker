@@ -18,9 +18,9 @@
 
 				<!--Navigation signin-out-up -->
 				<% if session[:user] %>
-					<form class="form-inline pull-right" action="signout" method="GET">
+					<form class="form-inline pull-right font-md" action="signout" method="GET">
 						Logged in as <%= session[:user] %>
-						<input type="submit" class="btn btn-link" value="sign out">
+						<input type="submit" class="btn btn-link btn-lg" value="sign out">
 					</form>
 				<% else %>
 					<li class="pull-right"><a href="/signin" >Sign in</a></li>
@@ -33,7 +33,7 @@
 
 		<!--notification -->
 		<% if flash[:notice] %>
-			<div class="alert alert-info">
+			<div class="alert alert-info font-md">
 					<p><%= flash[:notice] %></p>
 			</div>
 		 <% end %>
