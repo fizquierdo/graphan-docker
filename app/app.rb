@@ -25,6 +25,18 @@ before do
 end
 
 ###
+# Accesss control for logged users
+#
+register do 
+	def auth(type)
+		# add a condition to the route
+		condition do 
+			redirect "/" unless send("is_#{type}?")
+		end
+	end
+end
+
+###
 # Helpers
 #
 
@@ -33,6 +45,12 @@ helpers do
 		username = session[:user] || "unlogged-user"
 		logger.debug "CURRENT user #{username}"
 		username
+	end
+	def is_user?
+		@username != "unlogged-user"
+	end
+	def is_admin?
+		@username == "admin"
 	end
 	def backbone_window(backbone, backbone_id, window_size=3)
 		start_offset = 1
@@ -82,7 +100,15 @@ def get_top_recommendations(graphan, username)
 end
 
 ###
-# auth
+# App 
+#
+
+before do
+	@username = get_username
+end
+
+###
+# App - auth
 #
 get '/signin/?' do 
 	erb :signin
@@ -139,18 +165,16 @@ post '/signup/?' do
 end
 
 get '/signout' do
-	# TODO implement this as a link/button so that it runs on-click
 	session[:user] = nil
 	flash[:notice] = 'You have been signed out.'
 	redirect '/'
 end
 
 ####
-# App
+# App - graphan
+
 
 get '/' do
-	@username = get_username
-
 	# Last activity
 	@learning_simp, @learning_date = graphan.words_last_timestamp(@username, 'LEARNING')
 	@known_simp, @known_date = graphan.words_last_timestamp(@username, 'KNOWS')
@@ -163,7 +187,7 @@ get '/' do
 	@tops = get_top_recommendations(graphan, @username)
 
 	# Backbone state (this info is independent of the user, just shows bb-quality)
-	if @username == 'admin'
+	if is_admin?
 		disconn= graphan.characters_connected(false)
 		connect= graphan.characters_connected(true)
 		word_bb_counts = graphan.word_bb_counts
@@ -176,8 +200,7 @@ get '/' do
 	erb :index 
 end
 
-get '/tonelist' do 
-	@username = get_username
+get '/tonelist', :auth => :user do 
 	triplets = graphan.words_grouped_by_tones(@username)
 	@quartets = triplets.map do |num, words, tone|
 		known_words = words["KNOWS"] || []
@@ -189,8 +212,7 @@ get '/tonelist' do
 	erb :tonelist
 end
 
-get '/backbone_node' do 
-	@username = get_username
+get '/backbone_node', :auth => :user do 
 	raise "Missing backbone_id in #{params}" unless params["backbone_id"]
 
 	@backbone_node   = graphan.backbone_node(@username, params["backbone_id"])
@@ -206,8 +228,9 @@ get '/backbone_node' do
 	erb :backbone_node
 end
 
+# Backbone is available to be seen for an unlogged-user
 get '/backbone' do 
-	@backbone = graphan.backbone(get_username)
+	@backbone = graphan.backbone(@username)
 	erb :backbone
 end
 
@@ -226,6 +249,6 @@ post '/forgot_word' do
 end
 
 # in home
-get '/follow_recommendation' do
+get '/follow_recommendation', :auth => :user do
 	redirect to("/backbone_node?#{escaped_query(params)}")
 end
