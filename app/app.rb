@@ -52,6 +52,19 @@ helpers do
 		ordered_chars
 	end
 
+	def build_tonepair_matrix(quartets)
+		# Decompose the quartets into a tone pairs matrix
+		# First tones (rows) range from 1 to 4
+		# Second tones (cols) range from 1 to 5 to include neutral tone endings
+		tone_pairs = quartets.select{ |_, _, _, tone| tone.size == 2 }
+		tone_matrix = Hash[1.upto(4).map{|n| [n.to_s,Hash[1.upto(5).map{|x| [x.to_s,{}]}]]}]
+		tone_pairs.each do |_, known, learning, tone|
+			first, second = tone.split('')
+			tone_matrix[first][second] = {known: known[0..1], learning: learning[0..1]}
+		end
+		tone_matrix
+	end
+
 	def escaped_query(params)
 		URI.escape(params.map{|k, v| "#{k}=#{v}"}.join('&'))
 	end
@@ -166,11 +179,13 @@ end
 get '/tonelist' do 
 	@username = get_username
 	triplets = graphan.words_grouped_by_tones(@username)
-	@triplets = triplets.map do |num, words, tone|
+	@quartets = triplets.map do |num, words, tone|
 		known_words = words["KNOWS"] || []
 		learning_words = words["LEARNING"] || []
 		[num, known_words, learning_words, tone]
 	end
+	@tonepair_matrix = build_tonepair_matrix(@quartets)
+
 	erb :tonelist
 end
 

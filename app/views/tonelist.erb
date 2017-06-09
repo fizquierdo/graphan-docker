@@ -1,6 +1,48 @@
 <% #encoding: UTF-8	%>
+<!-- 
+Matrix of tone pairs
+	1	2	3 4 5
+1 x x x x x
+2 x x x x x
+3 x x x x x
+4 x x x x x
+
+-->
+
 <hr>
-<table class='table'>
+<table class='table table-responsive font-lg'>
+	<thead>
+		<tr>
+			<th>Tones</th>
+			<th>1</th>
+			<th>2</th>
+			<th>3</th>
+			<th>4</th>
+			<th>5</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% 1.upto(4).each do |row_i| %>
+			<tr>
+				<td><%= row_i.to_s %></td>
+				<% 1.upto(5).each do |col_i| %>
+						<td>
+							<span style="color:green;">
+								<%= @tonepair_matrix[row_i.to_s][col_i.to_s][:known].join(' ') %>
+							</span>
+							<br/>
+							<%= @tonepair_matrix[row_i.to_s][col_i.to_s][:learning].join(' ') %>
+						</td>
+				<% end %>
+			</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<!-- Complete table of all possible tone combos and their frequency -->
+
+<hr>
+<table class='table font-lg'>
 	<thead>
 		<tr>
 			<th>Count</th>
@@ -8,8 +50,9 @@
 			<th>Words</th>
 		</tr>
 	</thead>
-	<% @triplets.each do |triplet| %>
-		<% num, known_words, learning_words, tone = triplet %>
+
+	<% @quartets.each do |quartet| %>
+		<% num, known_words, learning_words, tone = quartet %>
 		<tbody>
 			<tr>
 				<td><%= num %></td>
@@ -21,4 +64,5 @@
 			</tr>
 		</tbody>
 	<% end %>
+
 </table>

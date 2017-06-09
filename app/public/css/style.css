@@ -17,6 +17,11 @@
 	font-size: 50px;
 }
 
+/* Make font large for the backbone navigation */
+.backbone_window .btn-lg{
+	font-size: 35px;
+}
+
 /* hide stuff int he recommendations */
 .hidden {
 	display:none;
