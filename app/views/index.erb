@@ -10,7 +10,7 @@
 				<div class="thumbnail">
 					<p>Hello <%= @username %>, your latest activities:</p>
 					<ul>
-						<% unless @leaning_simp.nil? %>
+						<% unless @learning_simp.nil? %>
 							<li> <%= @learning_date %> started to study <%= @learning_simp %> </li>
 						<% end %>
 						<% unless @known_simp.nil? %>
