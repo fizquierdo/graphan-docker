@@ -35,7 +35,7 @@ class Panel
 
 		# add a final total row
 		sum_row = ['Total'] + [0] * (@levels.size + 1)
-		rows.each_with_index do |row, row_i|
+		rows.each_with_index do |row|
 			row.each_with_index do |value, i|
 				sum_row[i]+= value if i > 0
 			end

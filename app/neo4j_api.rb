@@ -133,7 +133,7 @@ class Neo4j
 				h[:variants].each do |variant|
 					if variant.include? '('
 						variant_simp, note = variant.split('(')
-						note = note.gsub(')','').strip
+						note = note.delete(')').strip
 					else
 						variant_simp = variant
 						note = "NA"

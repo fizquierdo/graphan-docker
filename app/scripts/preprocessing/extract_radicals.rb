@@ -13,8 +13,7 @@ def decompose(character, list_id = 0)
 		# 1 decomposes in radicals
 		# 2 decomposes following some graphical pattern
 		begin
-			han = nil
-			han, decomp = box.text.gsub("\n","").to_s.split('=>')
+			_, decomp = box.text.delete("\n").to_s.split('=>')
 			decompositions[i] = decomp.strip.split(',').map{|n|n.strip}
 		rescue
 			decompositions[i] = []
