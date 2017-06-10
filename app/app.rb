@@ -269,6 +269,11 @@ post '/from_knows_to_learning' do
 	redirect to("/words")
 end
 
+post '/words_filter' do 
+	@words = graphan.words(@username).select{|w| w[:rel] == params["selRel"]}
+	erb :words
+end
+
 # in home
 get '/follow_recommendation', :auth => :user do
 	redirect to("/backbone_node?#{escaped_query(params)}")

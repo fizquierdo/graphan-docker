@@ -1,18 +1,23 @@
 <% #encoding: UTF-8	%>
 
-<!-- Complete table of all words -->
-<% actions  = {
-	"LEARNING" => "from_learning_to_knows", 
-	"IGNORES" => "from_ignores_to_learning", 
-	"KNOWS" => "from_knows_to_learning" }  %>
-<% messages = {
-	"LEARNING" => "Know it",     
-	"IGNORES" => "Learning it",   
-	"KNOWS" => "Forgot it" }  %>
-<% btn_class_style = {
-	"LEARNING" => "btn-success", 
-	"IGNORES" => "btn-warning", 
-	"KNOWS" => "btn-danger" }  %>
+<!-- Complete table of all words selRel ; post words_filter -->
+<% actions  = {"LEARNING" => "from_learning_to_knows", "IGNORES" => "from_ignores_to_learning", "KNOWS" => "from_knows_to_learning" }  %>
+<% messages = {"LEARNING" => "Know it", "IGNORES" => "Learning it", "KNOWS" => "Forgot it" }  %>
+<% btn_class_style = {"LEARNING" => "btn-success", "IGNORES" => "btn-warning", "KNOWS" => "btn-danger" }  %>
+
+<div class="container">
+	<form class="form-inline" action="words_filter" method="POST">
+		<div class="form-group">
+			<label for="selRel">Filter Words</label>
+			<select class="form-control" name="selRel" id="selRel">
+					<option value="KNOWS">Known</option>
+					<option value="LEARNING">Learning</option>
+					<option value="IGNORES">Unseen</option>
+			</select>
+		</div>
+		<button type="submit" class="btn btn-primary">Filter</button>
+	</form>
+</div>
 
 <hr>
 <table class='table font-lg table-responsive'>
