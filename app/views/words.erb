@@ -1,6 +1,18 @@
 <% #encoding: UTF-8	%>
 
 <!-- Complete table of all words -->
+<% actions  = {
+	"LEARNING" => "from_learning_to_knows", 
+	"IGNORES" => "from_ignores_to_learning", 
+	"KNOWS" => "from_knows_to_learning" }  %>
+<% messages = {
+	"LEARNING" => "Know it",     
+	"IGNORES" => "Learning it",   
+	"KNOWS" => "Forgot it" }  %>
+<% btn_class_style = {
+	"LEARNING" => "btn-success", 
+	"IGNORES" => "btn-warning", 
+	"KNOWS" => "btn-danger" }  %>
 
 <hr>
 <table class='table font-lg table-responsive'>
@@ -18,12 +30,19 @@
 	<% @words.each do |w| %>
 		<tbody>
 			<tr>
-				<td><%= w[:simp] %></td>
+				<td class="font-huge"><%= w[:simp] %></td>
 				<td><%= w[:pinyin] %></td>
 				<td><%= w[:level] %></td>
 				<td><%= w[:date] %></td>
 				<td><%= w[:rel].downcase %></td>
-				<td></td>
+				<td>
+					<form action="<%=actions[w[:rel]]%>" method="POST">
+						<input type="hidden" name="word_unique" value="<%= w[:word_unique] %>">
+						<input type="submit" 
+						class="btn btn-lg btn-block <%=btn_class_style[w[:rel]]%>" 
+						value="<%=messages[w[:rel]]%>">
+					</form>
+				</td>
 			</tr>
 		</tbody>
 	<% end %>

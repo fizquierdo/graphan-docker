@@ -255,6 +255,20 @@ post '/forgot_word' do
 	redirect to("/backbone_node?#{escaped_query(params)}")
 end
 
+# in words
+post '/from_ignores_to_learning' do
+	graphan.update_known_relationship(@username, params["word_unique"], 'IGNORES', 'LEARNING')
+	redirect to("/words")
+end
+post '/from_learning_to_knows' do
+	graphan.update_known_relationship(@username, params["word_unique"], 'LEARNING', 'KNOWS')
+	redirect to("/words")
+end
+post '/from_knows_to_learning' do
+	graphan.update_known_relationship(@username, params["word_unique"], 'KNOWS', 'LEARNING')
+	redirect to("/words")
+end
+
 # in home
 get '/follow_recommendation', :auth => :user do
 	redirect to("/backbone_node?#{escaped_query(params)}")
