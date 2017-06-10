@@ -30,7 +30,10 @@
 	<% @words.each do |w| %>
 		<tbody>
 			<tr>
-				<td class="font-huge"><%= w[:simp] %></td>
+				<td class="font-huge">
+					<a target="_blank" href=http://ce.linedict.com/dict.html#/cnen/example?query=<%=w[:simp]%>><%= w[:simp] %>
+					</a>
+				</td>
 				<td><%= w[:pinyin] %></td>
 				<td><%= w[:level] %></td>
 				<td><%= w[:date] %></td>
