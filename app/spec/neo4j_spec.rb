@@ -117,6 +117,29 @@ describe "Queries for backbone" do
 	end
 end
 
+describe "Queries for Words view" do
+	before(:each) do
+		init_test_db
+		@user_data = {name: 'Bob', hash: 'hashedvalue'}
+	end
+
+	describe "words" do
+		before(:each) do
+			import_words
+			@neo.create_user(@user_data)
+		end
+
+		it 'returns all words' do
+			ret = @neo.words('Bob')
+			expect(ret.size).to eq(12)
+		end
+		it 'returns all words as IGNORES' do
+			ret = @neo.words('Bob')
+			expect(ret.map{|w| w[:rel]}.uniq.first).to eq('IGNORES')
+		end
+	end
+end
+
 describe "Queries for index view" do
 
 	before(:each) do

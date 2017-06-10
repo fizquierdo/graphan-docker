@@ -212,6 +212,13 @@ get '/tonelist', :auth => :user do
 	erb :tonelist
 end
 
+# Show a list of all words, could show for unlogged-user
+get '/words', :auth => :user do 
+	@words = graphan.words(@username)
+	erb :words
+end
+
+# Backbone
 get '/backbone_node', :auth => :user do 
 	raise "Missing backbone_id in #{params}" unless params["backbone_id"]
 

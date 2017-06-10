@@ -1,0 +1,31 @@
+<% #encoding: UTF-8	%>
+
+<!-- Complete table of all words -->
+
+<hr>
+<table class='table font-lg table-responsive'>
+	<thead>
+		<tr>
+			<th>Word</th>
+			<th>Pinyin</th>
+			<th>HSK</th>
+			<th>Date</th>
+			<th>Knowledge</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<% @words.each do |w| %>
+		<tbody>
+			<tr>
+				<td><%= w[:simp] %></td>
+				<td><%= w[:pinyin] %></td>
+				<td><%= w[:level] %></td>
+				<td><%= w[:date] %></td>
+				<td><%= w[:rel].downcase %></td>
+				<td></td>
+			</tr>
+		</tbody>
+	<% end %>
+
+</table>

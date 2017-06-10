@@ -306,7 +306,7 @@ class Neo4j
 		cypher = "
 		MATCH (r:Radical{simp: '#{simp}'}) 
 		RETURN r.simp as simp"
-    graph = @neo.execute_query(cypher)
+		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)[0]
 	end
 
@@ -315,10 +315,25 @@ class Neo4j
 	#
 	# Index
 	#  all pending testing
+	def words(username)
+		cypher = "
+		MATCH (:Person {name:'#{username}'})-[rel]->(w:Word) 
+		RETURN w.hsk as level, 
+					 w.simp as simp,
+					 w.pinyin_tonemarks as pinyin,
+					 type(rel) as rel,
+					 rel.date as date
+		ORDER BY date DESC, rel, level"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph).map do |h| 
+			h[:date] = format_timestamp(h[:date])
+			h
+		end
+	end
 	def words_top(username, relationship, top_size)
 		# Some words will not be connected to the backbone yet, 
 		# but they will later on as the backbone grows
-		cypher = "MATCH (u:Person {name:'#{username}'})-[rel:#{relationship}]->(w:Word) 
+		cypher = "MATCH (:Person {name:'#{username}'})-[rel:#{relationship}]->(w:Word) 
 							MATCH (ch:Character)<-[:HAS_CHARACTER]-(w)-[:HAS_PINYIN]->(pw:PinyinWord)
 						  MATCH (b:Backbone)-[:IS_CHARACTER]->(ch)
 							RETURN type(rel) as word_rel, 
@@ -340,8 +355,7 @@ class Neo4j
 							LIMIT 1"
 		graph = @neo.execute_query(cypher)
 	  simp, timestamp = graph["data"].first # because we know we limit 1
-		#date = Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d %H:%M:%S")
-		date = Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d")
+		date = format_timestamp(timestamp)
 		[simp, date]
 	end
 
@@ -505,6 +519,10 @@ class Neo4j
 	end
 
 	private
+	def format_timestamp(timestamp)
+		#Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d %H:%M:%S")
+		Time.at((timestamp.to_f / 1000).to_i).strftime("%Y-%m-%d")
+	end
 	def records_to_hashes(graph)
 		# Converts a list of result records into a list of hashes
 		headers = graph["columns"]
