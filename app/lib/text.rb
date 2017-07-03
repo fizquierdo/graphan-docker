@@ -61,7 +61,7 @@ class AnnotatedText
 				fw = @records.select{|this_word| this_word[:simp] == w}[0]
 				word = {type: :hsk_word, text: w, word: fw}
 				@scores << fw[:level].to_f
-				@words_known += 1
+				@words_known += 1 if fw[:rel] == "KNOWS"
 			else
 				word = {text: w, word: nil}
 				if w.match(@punct_regex).nil?
