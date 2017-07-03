@@ -1,5 +1,4 @@
 <h1><%= @title %></h1>
-<p><%= @text %></p>
 <br>
 
 <ul>
@@ -7,10 +6,13 @@
 	Total words: <%= @num_words %>
 	</li>
 	<li>
-	HSK words: <%= @hsk_words %>
+	HSK words: <%= @num_hsk_words %>
 	</li>
 	<li>
-	Estimated level: <%= @score %>
+	Estimated Text level: <%= @score %>
+	</li>
+	<li>
+	Estimated User Known: <%= @words_known_proportion %>
 	</li>
 </ul>
 <br>
@@ -38,3 +40,7 @@
 	</div>
 
 <% end %>
+
+<br>
+<p>Original Text</p>
+<p><%= @text %></p>

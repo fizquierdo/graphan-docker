@@ -6,7 +6,7 @@
 
 class AnnotatedText
 
-	attr_reader :words, :avg_score, :hsk_words, :total_words
+	attr_reader :words, :avg_score, :hsk_words, :total_words, :known_proportion
 
 	def initialize(text, records)
 		# records are words existing in the system for a given user 
@@ -21,11 +21,13 @@ class AnnotatedText
 	def annotate
 		@scores = []
 		@words = []
+		@words_known = 0
 		# Segment and calculate avg_score
 		segment
 		@avg_score = @scores.inject{ |sum, el| sum + el }.to_f / @scores.size
 		@hsk_words = @words.select{|w| w[:type] == :hsk_word}.size
 		@total_words = @words.select{|w| w[:type] != :punctuation}.size
+		@known_proportion = @words_known.to_f / @total_words.to_f
 	end
 
 	private
@@ -59,6 +61,7 @@ class AnnotatedText
 				fw = @records.select{|this_word| this_word[:simp] == w}[0]
 				word = {type: :hsk_word, text: w, word: fw}
 				@scores << fw[:level].to_f
+				@words_known += 1
 			else
 				word = {text: w, word: nil}
 				if w.match(@punct_regex).nil?

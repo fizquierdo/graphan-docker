@@ -320,6 +320,7 @@ get '/annotated_text', :auth => :user do
 	@words = annotated_text.words
 	@num_hsk_words = annotated_text.hsk_words
 	@num_words = annotated_text.total_words
+	@words_known_proportion = annotated_text.known_proportion.round(2).to_s
 	@title = text[:title]
 	@text = text[:text]
 	erb :annotated_text
