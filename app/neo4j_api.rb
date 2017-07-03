@@ -26,6 +26,23 @@ class Neo4j
 		end
 	end
 
+	#### 
+	# Texts 
+	#
+	def create_text(text)
+		# Add a user node to the db where 
+		# text <- {title: str, source: str, text: str}
+		node = @neo.create_node(text)
+		@neo.add_label(node, "Text")
+	end
+	def get_texts
+		cypher = "
+		MATCH (t:Text) 
+		RETURN t.title as title, t.source as source, t.text as text"
+		graph = @neo.execute_query(cypher)
+		records_to_hashes(graph)
+	end
+
 
 	#### 
 	# Users 

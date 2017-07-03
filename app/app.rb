@@ -278,3 +278,34 @@ end
 get '/follow_recommendation', :auth => :user do
 	redirect to("/backbone_node?#{escaped_query(params)}")
 end
+
+get '/texts' do 
+	@edit_view = false
+	# List existing texts in the system
+	# Could show the score in advance
+	@texts = graphan.get_texts
+	@edit_view = true if is_admin? # show edit functionality
+	erb :texts
+end
+
+get '/add_text', :auth => :admin do 
+	# Add a text to the system
+	erb :add_text
+end
+
+post '/add_text', :auth => :admin do 
+	text = {title: params[:title], source: params[:source], text: params[:text]}
+	logger.debug "Adding TEXT #{text}"
+	graphan.create_text(text)
+	redirect '/texts'
+end
+
+# TODO add annotation of text according to currently logged user
+get '/annotated_text', :auth => :user do 
+	# User has selected one text and wants to read it annotated
+	# params["text_title"] should contain t[:title]
+	text = graphan.get_texts.select{|t| t[:title] == params["text_title"]}.first
+	@title = text[:title]
+	@text = text[:text]
+	erb :annotated_text
+end
