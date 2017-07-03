@@ -1,3 +1,4 @@
+#encoding: UTF-8
 require 'neography'
 require "csv"
 
@@ -35,6 +36,12 @@ class Neo4j
 		node = @neo.create_node(text)
 		@neo.add_label(node, "Text")
 	end
+	def delete_text(text_title)
+		# Deletes a Text node with a given title
+		# NOTE Assumes title is unique
+		cypher = "MATCH (t:Text{title: '#{text_title}'}) DELETE t"
+		@neo.execute_query(cypher)
+	end
 	def get_texts
 		cypher = "
 		MATCH (t:Text) 
@@ -42,7 +49,6 @@ class Neo4j
 		graph = @neo.execute_query(cypher)
 		records_to_hashes(graph)
 	end
-
 
 	#### 
 	# Users 

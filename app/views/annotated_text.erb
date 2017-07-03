@@ -1,14 +1,40 @@
-<p>
-	Title: 
-	<%= @title %>
-</p>
-<p>
-		Score: 
-</p>
-<p>
-	Text: 
-	<%= @text %>
-</p>
-<p>
-	Annotated Text: 
-</p>
+<h1><%= @title %></h1>
+<p><%= @text %></p>
+<br>
+
+<ul>
+	<li>
+	Total words: <%= @num_words %>
+	</li>
+	<li>
+	HSK words: <%= @hsk_words %>
+	</li>
+	<li>
+	Estimated level: <%= @score %>
+	</li>
+</ul>
+<br>
+
+<% @words.each do |word| %>
+
+	<% if word[:type] == :hsk_word %>
+		<% word_rel = word[:word][:rel].downcase %>
+		<% pinyin = word[:word][:pinyin] %>
+	<% else %>
+		<% word_rel = '' %>
+		<% pinyin = '' %>
+		<% if word[:text] == "\n" %>
+			<br><% next %>
+		<% end %>
+	<% end %>
+
+	<div class="word <%= word_rel %>">
+		<div class="pinyin">
+			<%= pinyin %>
+		</div>
+		<div class="hanzi">
+			<%= word[:text] %>
+		</div>
+	</div>
+
+<% end %>

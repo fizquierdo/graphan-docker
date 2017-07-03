@@ -2,12 +2,15 @@
 
 <!-- Complete table of all available texts -->
 
-<table class='table font-lg table-responsive'>
+<table class='table font-md table-responsive'>
 	<thead>
 		<tr>
 			<th>Title</th>
 			<th>Source</th>
-			<th>Action</th>
+			<th>Text</th>
+			<% if @edit_view %>
+				<th>Delete</th>
+			<% end %>
 		</tr>
 	</thead>
 
@@ -19,9 +22,17 @@
 				<td>
 					<form action="annotated_text" method="GET">
 						<input type="hidden" name="text_title" value="<%= t[:title] %>">
-						<input type="submit" class="btn btn-lg btn-block" value="See Text">
+						<input type="submit" class="btn btn-lg btn-default" value="See Text">
 					</form>
 				</td>
+				<% if @edit_view %>
+					<td>
+						<form action="delete_text" method="POST">
+							<input type="hidden" name="text_title" value="<%= t[:title] %>">
+							<input type="submit" class="btn btn-lg btn-danger" value="Delete">
+						</form>
+					</td>
+				<% end %>
 			</tr>
 		</tbody>
 	<% end %>

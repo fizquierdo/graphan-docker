@@ -1,8 +1,10 @@
+#encoding: UTF-8
 require 'sinatra'
 require 'sinatra/flash'
 require_relative 'neo4j_api'
 require_relative 'lib/user'
 require_relative 'lib/panel'
+require_relative 'lib/text'
 
 ###
 # Config
@@ -279,6 +281,10 @@ get '/follow_recommendation', :auth => :user do
 	redirect to("/backbone_node?#{escaped_query(params)}")
 end
 
+#######
+# Texts
+#
+
 get '/texts' do 
 	@edit_view = false
 	# List existing texts in the system
@@ -300,11 +306,20 @@ post '/add_text', :auth => :admin do
 	redirect '/texts'
 end
 
-# TODO add annotation of text according to currently logged user
+post '/delete_text', :auth => :admin do 
+	graphan.delete_text(params["text_title"])
+	redirect '/texts'
+end
+
 get '/annotated_text', :auth => :user do 
-	# User has selected one text and wants to read it annotated
-	# params["text_title"] should contain t[:title]
 	text = graphan.get_texts.select{|t| t[:title] == params["text_title"]}.first
+	user_words = graphan.words(@username)
+	logger.debug "Annotating TEXT #{text[:text]}"
+	annotated_text = AnnotatedText.new(text[:text], user_words)
+	@score = annotated_text.avg_score.round(2).to_s
+	@words = annotated_text.words
+	@num_hsk_words = annotated_text.hsk_words
+	@num_words = annotated_text.total_words
 	@title = text[:title]
 	@text = text[:text]
 	erb :annotated_text
