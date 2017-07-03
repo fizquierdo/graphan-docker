@@ -15,6 +15,7 @@
 	Estimated User Known: <%= @words_known_proportion %>
 	</li>
 </ul>
+
 <br>
 
 <% @words.each do |word| %>
@@ -22,9 +23,11 @@
 	<% if word[:type] == :hsk_word %>
 		<% word_rel = word[:word][:rel].downcase %>
 		<% pinyin = word[:word][:pinyin] %>
+		<% eng = word[:word][:eng] %>
 	<% else %>
 		<% word_rel = '' %>
 		<% pinyin = '' %>
+		<% eng = '' %>
 		<% if word[:text] == "\n" %>
 			<br><% next %>
 		<% end %>
@@ -35,7 +38,7 @@
 			<%= pinyin %>
 		</div>
 		<div class="hanzi">
-			<%= word[:text] %>
+			<a href="#" class="nounderline" data-toggle="tooltip" title="<%= eng %>"><%= word[:text] %></a>
 		</div>
 	</div>
 
@@ -44,3 +47,4 @@
 <br>
 <p>Original Text</p>
 <p><%= @text %></p>
+

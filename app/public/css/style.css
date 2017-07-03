@@ -65,6 +65,11 @@
 	text-align: center;
 }
 
+.nounderline {
+	color: black;
+	text-decoration: none;
+}
+
 /* toggle pinyin content */
 .pinyin-content{
 }

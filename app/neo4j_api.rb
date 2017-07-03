@@ -343,6 +343,7 @@ class Neo4j
 		MATCH (:Person {name:'#{username}'})-[rel]->(w:Word) 
 		RETURN w.hsk as level, 
 					 w.simp as simp,
+					 w.eng as eng,
 					 w.unique as word_unique,
 					 w.pinyin_tonemarks as pinyin,
 					 type(rel) as rel,
