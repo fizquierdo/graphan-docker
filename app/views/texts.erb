@@ -1,0 +1,35 @@
+<% #encoding: UTF-8	%>
+
+<!-- Complete table of all available texts -->
+
+<table class='table font-lg table-responsive'>
+	<thead>
+		<tr>
+			<th>Title</th>
+			<th>Source</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<% @texts.each do |t| %>
+		<tbody>
+			<tr>
+				<td><%= t[:title] %></td>
+				<td><a target="_blank" href=<%= t[:source] %>>Source</a></td>
+				<td>
+					<form action="annotated_text" method="GET">
+						<input type="hidden" name="text_title" value="<%= t[:title] %>">
+						<input type="submit" class="btn btn-lg btn-block" value="See Text">
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	<% end %>
+
+</table>
+
+<!-- if user is admin should see link to edit -->
+<% if @edit_view %>
+	<hr>
+	<a href="/add_text" >Add new text</a>
+<% end %>
