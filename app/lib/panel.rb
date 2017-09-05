@@ -67,11 +67,17 @@ class Panel
 		[headings, rows]
 	end
 	def backbone_table_inverted(table)
+		# Format results as level-columns and add last column as sum
 		headings, rows = table
 		all_rows = [headings] + rows 		
 		new_table = all_rows.transpose
-		new_headings = new_table.pop
-		[new_headings, new_table]
+		new_headings = new_table.pop + ['All']
+		# for each row sum all values and add as last column
+		new_rows = new_table.map do |row|
+			rowsum = row[1..-1].inject(0){|n,acc|n+acc}
+			row + [rowsum]
+		end
+		[new_headings, new_rows]
 	end
 
 end
