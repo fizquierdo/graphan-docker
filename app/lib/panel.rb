@@ -51,7 +51,7 @@ class Panel
 		headings = ['chars-in-bb', 'chars-not-repr', 'words-via-bb', 'level']
 		rows = @levels.map do |level|
 				row = []
-				[disconn, connect, words_connected].each do |a|
+				[connect, disconn, words_connected].each do |a|
 					counter = a.select{|c| c[:level] == level}
 					if counter.empty?
 						count = 0
@@ -65,6 +65,13 @@ class Panel
 				row
 		end
 		[headings, rows]
+	end
+	def backbone_table_inverted(table)
+		headings, rows = table
+		all_rows = [headings] + rows 		
+		new_table = all_rows.transpose
+		new_headings = new_table.pop
+		[new_headings, new_table]
 	end
 
 end

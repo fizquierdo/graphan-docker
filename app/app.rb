@@ -189,15 +189,11 @@ get '/' do
 	@tops = get_top_recommendations(graphan, @username)
 
 	# Backbone state (this info is independent of the user, just shows bb-quality)
-	if is_admin?
-		disconn= graphan.characters_connected(false)
-		connect= graphan.characters_connected(true)
-		word_bb_counts = graphan.word_bb_counts
-		@bb_headings, @bb_rows = panel.backbone_table(disconn, connect, word_bb_counts)
-		@display_bb = true
-	else
-		@display_bb = false
-	end
+	disconn= graphan.characters_connected(false)
+	connect= graphan.characters_connected(true)
+	word_bb_counts = graphan.word_bb_counts
+	table = panel.backbone_table(disconn, connect, word_bb_counts)
+	@bb_headings, @bb_rows = panel.backbone_table_inverted(table)
 
 	erb :index 
 end

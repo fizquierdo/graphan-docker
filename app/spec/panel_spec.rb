@@ -80,8 +80,8 @@ describe "Panel helpers" do
 			_ , rows = @panel.backbone_table([{count: 5, level: "2"}],[{count: 10, level: "2"}],[])
 			expect(rows.size).to eq(@panel.levels.size)
 			row_level_2 = rows.select{|r| r[3] == "2"}
-			expect(row_level_2.first[0]).to eq(5)
-			expect(row_level_2.first[1]).to eq(10)
+			expect(row_level_2.first[0]).to eq(10)
+			expect(row_level_2.first[1]).to eq(5)
 		end
 	end
 
