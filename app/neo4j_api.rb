@@ -23,9 +23,7 @@ class Neo4j
 			@neo = Neography::Rest.new({port: config["port"],
 															 server: config["server"],
 															 username: config["username"],
-															 password: config["password"],
-			}
-																)
+															 password: config["password"]})
 		end
 	end
 
