@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-# Fix Sinatra version to ensure compatibility with upcoming releases
-gem 'sinatra', '1.4.7'
+gem 'sinatra'
 
 # Testing
 gem 'rspec'
